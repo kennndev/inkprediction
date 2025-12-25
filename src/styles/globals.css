@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Space+Grotesk:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --neon-pink: #FF2D95;
+  --neon-purple: #A855F7;
+  --neon-cyan: #06B6D4;
+  --neon-green: #39FF14;
+  --neon-yellow: #FDE047;
+  --dark-bg: #0B0C15;
+  --grid-color: rgba(168, 85, 247, 0.2);
+}
+
+body {
+  margin: 0;
+  font-family: 'VT323', monospace; /* Default to retro console font */
+  background-color: var(--dark-bg);
+  color: #fff;
+  overflow-x: hidden;
+  font-size: 18px; /* Slightly larger for pixel fonts */
+}
+
+/* =========================================
+   SYNTHWAVE GRID BACKGROUND
+   ========================================= */
+.bg-grid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: 
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center bottom;
+  perspective: 500px;
+  transform-style: preserve-3d;
+  z-index: -2;
+}
+
+.bg-grid::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--dark-bg) 0%, transparent 40%, var(--dark-bg) 95%);
+  z-index: -1;
+}
+
+/* Sun in the horizon */
+.retro-sun {
+  position: fixed;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(to bottom, #FF2D95, #FDE047);
+  border-radius: 50%;
+  box-shadow: 0 0 100px var(--neon-pink);
+  z-index: -3;
+  clip-path: polygon(0 0, 100% 0, 100% 60%, 0 60%);
+}
+
+.retro-sun::after {
+  content: '';
+  position: absolute;
+  bottom: 40%;
+  left: 0;
+  width: 100%;
+  height: 20%;
+  background: var(--dark-bg);
+  opacity: 0.2;
+}
+
+/* =========================================
+   ARCADE TEXT STYLES
+   ========================================= */
+h1, h2, h3, h4, .font-arcade {
+  font-family: 'Press Start 2P', cursive;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+.text-shadow-neon {
+  text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-purple);
+}
+
+.text-gradient-arcade {
+  background: linear-gradient(180deg, #FDE047 0%, #FF2D95 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 5px rgba(255, 45, 149, 0.5));
+}
+
+/* =========================================
+   ARCADE BUTTONS (3D)
+   ========================================= */
+.arcade-btn {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  transform: translateY(0);
+}
+
+.arcade-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 #000 !important;
+}
+
+/* INSERT COIN / GREEN BUTTON */
+.btn-insert-coin {
+  @apply arcade-btn px-6 py-4 bg-green-500;
+  box-shadow: 
+    0 6px 0 #047857, /* Darker green shade */
+    0 12px 10px rgba(0,0,0,0.4);
+}
+
+/* NO / RED BUTTON */
+.btn-game-over {
+  @apply arcade-btn px-6 py-4 bg-red-500;
+  box-shadow: 
+    0 6px 0 #B91C1C, /* Darker red shade */
+    0 12px 10px rgba(0,0,0,0.4);
+}
+
+/* =========================================
+   CRT / CARD STYLES
+   ========================================= */
+.arcade-card {
+  background: rgba(16, 16, 24, 0.9);
+  border: 4px solid #2d2d2d;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Pixel Border Effect */
+.pixel-border {
+  box-shadow:
+    -4px 0 0 0 white,
+    4px 0 0 0 white,
+    0 -4px 0 0 white,
+    0 4px 0 0 white;
+  margin: 4px;
+  background: #000;
+}
+
+.pixel-border-purple {
+  border: 4px solid var(--neon-purple);
+  box-shadow: 0 0 15px var(--neon-purple), inset 0 0 15px var(--neon-purple);
+}
+
+/* =========================================
+   HEALTH BAR PROGRESS
+   ========================================= */
+.health-bar-container {
+  width: 100%;
+  height: 24px;
+  background: #333;
+  border: 2px solid #fff;
+  padding: 2px;
+  display: flex;
+}
+
+.health-bar-segment {
+  flex: 1;
+  height: 100%;
+  margin-right: 2px;
+  background: #555; /* Empty state */
+}
+
+.health-bar-segment.filled {
+  background: var(--neon-green);
+  box-shadow: 0 0 5px var(--neon-green);
+}
+
+.health-bar-segment.filled-danger {
+  background: var(--neon-pink);
+  box-shadow: 0 0 5px var(--neon-pink);
+}
+
+/* =========================================
+   LOADING SPINNER (PACMAN STYLE?)
+   ========================================= */
+.spinner-pixel {
+  width: 40px;
+  height: 40px;
+  background-color: var(--neon-yellow);
+  clip-path: polygon(100% 0, 100% 100%, 0 50%);
+  animation: chomp 0.5s infinite linear;
+}
+
+@keyframes chomp {
+  0% { clip-path: polygon(100% 0, 100% 100%, 0 50%); }
+  50% { clip-path: polygon(100% 20%, 100% 80%, 0 50%); }
+  100% { clip-path: polygon(100% 0, 100% 100%, 0 50%); }
+}
+
+/* =========================================
+   UTILITIES
+   ========================================= */
+.glass-strong {
+  /* Overriding glass for arcade to look more like plastic/metal */
+  background: rgba(20, 20, 30, 0.95);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+}

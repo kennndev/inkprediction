@@ -189,11 +189,11 @@ const MarketDetail = () => {
   const potentialPayout = calculatePayout(betAmount, market);
 
   // Dynamic Market Info
-  const isInkChain = market.tweetId && market.tweetId.toString().startsWith('ink_');
+  const isInkChain = market.category === 'INK CHAIN';
   const marketInfo = {
-    emoji: isInkChain ? '⛓️' : '🐦',
-    category: isInkChain ? 'INK CHAIN' : 'TWITTER',
-    question: `Will this ${isInkChain ? 'metric' : 'tweet'} reach ${(market.targetMetric / 1000).toFixed(1)}K ${market.metricType}s?`
+    emoji: market.emoji || (isInkChain ? '⛓️' : '🐦'),
+    category: market.category || (isInkChain ? 'INK CHAIN' : 'TWITTER'),
+    question: market.question
   };
 
   return (

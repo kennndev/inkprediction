@@ -9,6 +9,7 @@ import confetti from 'canvas-confetti';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { normalizeMarketData } from '../utils/normalizeMarketData';
+import { generateFallbackQuestion } from '../utils/formatMetricType';
 const USDC_ABI = [
   {
     "constant": false,
@@ -91,7 +92,11 @@ const MarketDetail = () => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await axios.get(`${API_URL}/api/market/${id}`);
+      console.log('Raw market from backend:', response.data.market);
+      console.log('Question from backend:', response.data.market.question);
       const market = normalizeMarketData(response.data.market);
+      console.log('Normalized market:', market);
+      console.log('Question after normalization:', market.question);
       setMarket(market);
       setLoading(false);
     } catch (error) {
@@ -196,12 +201,12 @@ const MarketDetail = () => {
   const progress = (market.currentMetric / market.targetMetric) * 100;
   const potentialPayout = calculatePayout(betAmount, market);
 
-  // Dynamic Market Info - detect Ink Chain from tweetId since backend doesn't send category
-  const isInkChain = market.tweetId && market.tweetId.toString().startsWith('ink_');
+  // Dynamic Market Info - use database values or generate fallback
+  const isInkChain = market.category === 'INK CHAIN' || (market.tweetId && market.tweetId.toString().startsWith('ink_'));
   const marketInfo = {
     emoji: market.emoji || (isInkChain ? '⛓️' : '🐦'),
     category: market.category || (isInkChain ? 'INK CHAIN' : 'TWITTER'),
-    question: market.question || `Will this ${isInkChain ? 'metric' : 'tweet'} reach ${(market.targetMetric / 1000).toFixed(1)}K ${market.metricType}s?`
+    question: market.question || generateFallbackQuestion(market)
   };
 
   return (

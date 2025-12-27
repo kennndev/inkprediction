@@ -19,6 +19,8 @@ const Home = () => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await axios.get(`${API_URL}/api/markets`);
+      console.log('Raw API Response:', response.data.markets);
+      console.log('First market RAW:', JSON.stringify(response.data.markets[0], null, 2));
       // Convert snake_case to camelCase
       const markets = response.data.markets.map(market => ({
         ...market,
@@ -39,6 +41,9 @@ const Home = () => {
         yesOdds: market.yes_odds || market.yesOdds || 5000,
         noOdds: market.no_odds || market.noOdds || 5000
       }));
+      console.log('Transformed Markets:', markets);
+      console.log('First market question:', markets[0]?.question);
+      console.log('First market category:', markets[0]?.category);
       setMarkets(markets);
       setLoading(false);
     } catch (error) {

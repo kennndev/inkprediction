@@ -20,7 +20,8 @@ const Portfolio = () => {
 
   const fetchUserBets = async () => {
     try {
-      const response = await axios.get(`/api/user/${address}/bets`);
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const response = await axios.get(`${API_URL}/api/user/${address}/bets`);
       setBets(response.data.bets);
       calculateStats(response.data.bets);
       setLoading(false);
@@ -196,8 +197,8 @@ const BetCard = ({ bet, index }) => (
       <div className="flex items-center justify-between mb-4">
         <span className="text-2xl">{bet.position ? '✅ YES' : '❌ NO'}</span>
         <span className={`px-4 py-2 rounded-full font-bold ${bet.position
-            ? 'bg-green-500/20 text-green-400'
-            : 'bg-red-500/20 text-red-400'
+          ? 'bg-green-500/20 text-green-400'
+          : 'bg-red-500/20 text-red-400'
           }`}>
           {bet.amount} USDC
         </span>

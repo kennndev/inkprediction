@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { normalizeMarketData } from '../utils/normalizeMarketData';
 
 const Home = () => {
   const [markets, setMarkets] = useState([]);
@@ -19,24 +20,7 @@ const Home = () => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await axios.get(`${API_URL}/api/markets`);
-      console.log('API Response:', response.data.markets);
-
-      // Normalize the data: convert strings to numbers and handle BigNumber objects
-      const markets = response.data.markets.map(market => ({
-        ...market,
-        targetMetric: parseFloat(market.target_metric || market.targetMetric || 0),
-        currentMetric: parseFloat(market.current_metric || market.currentMetric || 0),
-        metricType: market.metric_type || market.metricType,
-        tweetId: market.tweet_id || market.tweetId,
-        tweetUrl: market.tweet_url || market.tweetUrl,
-        yesPool: parseFloat(market.yesPool || market.yes_pool || 0),
-        noPool: parseFloat(market.noPool || market.no_pool || 0),
-        // Handle BigNumber objects for odds
-        yesOdds: market.yesOdds?.hex ? parseInt(market.yesOdds.hex, 16) : parseFloat(market.yesOdds || market.yes_odds || 5000),
-        noOdds: market.noOdds?.hex ? parseInt(market.noOdds.hex, 16) : parseFloat(market.noOdds || market.no_odds || 5000),
-        deadline: market.deadline
-      }));
-
+      const markets = response.data.markets.map(normalizeMarketData);
       setMarkets(markets);
       setLoading(false);
     } catch (error) {

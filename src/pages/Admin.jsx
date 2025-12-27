@@ -72,45 +72,35 @@ const CreatePredictionForm = () => {
         try {
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-            // Prepare payload for the simpler /create-market endpoint
-            let tweetId = formData.tweetUrl;
-
-            // Extract ID if it's a Twitter URL
-            if (formData.category === 'TWITTER' && formData.tweetUrl) {
-                const match = formData.tweetUrl.match(/status\/(\d+)/);
-                if (match) {
-                    tweetId = match[1];
-                } else {
-                    throw new Error('Invalid Tweet URL');
-                }
-            } else if (formData.category === 'INK CHAIN') {
-                // Generate a unique ID for Ink Chain markets
-                tweetId = `ink_${Date.now()}`;
-            }
-
+            // Use the /api/admin/predictions endpoint (handles both categories)
             const payload = {
-                tweetId,
-                targetMetric: formData.targetMetric,
+                category: formData.category,
+                question: formData.question,
+                emoji: formData.emoji,
+                tweetUrl: formData.tweetUrl,
+                inkContractAddress: formData.inkContractAddress,
+                targetMetric: parseInt(formData.targetMetric),
                 metricType: formData.metricType,
-                durationHours: formData.durationHours
+                durationHours: parseInt(formData.durationHours)
             };
 
-            // Use the direct creation endpoint that bypasses Supabase
-            const response = await axios.post(`${API_URL}/api/admin/create-market`, payload);
+            const response = await axios.post(`${API_URL}/api/admin/predictions`, payload);
 
-            toast.success('✅ Prediction created on-chain!');
+            if (response.data.success) {
+                toast.success(`✅ Prediction created! Market ID: ${response.data.marketId}`);
 
-            // Reset form
-            setFormData({
-                ...formData,
-                question: '',
-                tweetUrl: '',
-                inkContractAddress: '',
-                targetMetric: '',
-            });
+                // Reset form
+                setFormData({
+                    ...formData,
+                    question: '',
+                    tweetUrl: '',
+                    inkContractAddress: '',
+                    targetMetric: '',
+                });
+            }
         } catch (error) {
             console.error('Error creating prediction:', error);
-            toast.error(error.message || 'Failed to create prediction');
+            toast.error(error.response?.data?.error || 'Failed to create prediction');
         } finally {
             setCreating(false);
         }

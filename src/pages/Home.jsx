@@ -19,7 +19,27 @@ const Home = () => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await axios.get(`${API_URL}/api/markets`);
-      setMarkets(response.data.markets);
+      // Convert snake_case to camelCase
+      const markets = response.data.markets.map(market => ({
+        ...market,
+        tweetId: market.tweet_id,
+        tweetUrl: market.tweet_url,
+        inkContractAddress: market.ink_contract_address,
+        inkMetricEndpoint: market.ink_metric_endpoint,
+        targetMetric: market.target_metric,
+        metricType: market.metric_type,
+        currentMetric: market.current_metric,
+        marketId: market.market_id,
+        finalMetric: market.final_metric,
+        createdAt: market.created_at,
+        createdBy: market.created_by,
+        lastVerifiedAt: market.last_verified_at,
+        yesPool: market.yes_pool || market.yesPool || 0,
+        noPool: market.no_pool || market.noPool || 0,
+        yesOdds: market.yes_odds || market.yesOdds || 5000,
+        noOdds: market.no_odds || market.noOdds || 5000
+      }));
+      setMarkets(markets);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching markets:', error);

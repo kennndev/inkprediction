@@ -111,6 +111,12 @@ const MarketDetail = () => {
   });
 
   useEffect(() => {
+    // Only need approval if wallet is connected AND allowance is insufficient
+    if (!isConnected) {
+      setNeedsApproval(false); // Show "BET YES/NO" when not connected
+      return;
+    }
+
     if (allowance !== undefined && betAmount) {
       try {
         const amountWei = ethers.utils.parseUnits(betAmount, 6);
@@ -121,7 +127,7 @@ const MarketDetail = () => {
         console.error("Error checking allowance:", e);
       }
     }
-  }, [allowance, betAmount]);
+  }, [allowance, betAmount, isConnected]);
 
   // Approve USDC
   const { write: approveUSDC, data: approveData } = useContractWrite({

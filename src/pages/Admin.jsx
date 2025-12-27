@@ -44,6 +44,9 @@ const Admin = () => {
 
                 {/* Create Prediction Form */}
                 <CreatePredictionForm />
+
+                {/* Manage Markets */}
+                <ManageMarkets />
             </div>
         </motion.div>
     );
@@ -68,9 +71,34 @@ const CreatePredictionForm = () => {
 
         try {
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-            const response = await axios.post(`${API_URL}/api/admin/predictions`, formData);
 
-            toast.success('✅ Prediction created!');
+            // Prepare payload for the simpler /create-market endpoint
+            let tweetId = formData.tweetUrl;
+
+            // Extract ID if it's a Twitter URL
+            if (formData.category === 'TWITTER' && formData.tweetUrl) {
+                const match = formData.tweetUrl.match(/status\/(\d+)/);
+                if (match) {
+                    tweetId = match[1];
+                } else {
+                    throw new Error('Invalid Tweet URL');
+                }
+            } else if (formData.category === 'INK CHAIN') {
+                // Generate a unique ID for Ink Chain markets
+                tweetId = `ink_${Date.now()}`;
+            }
+
+            const payload = {
+                tweetId,
+                targetMetric: formData.targetMetric,
+                metricType: formData.metricType,
+                durationHours: formData.durationHours
+            };
+
+            // Use the direct creation endpoint that bypasses Supabase
+            const response = await axios.post(`${API_URL}/api/admin/create-market`, payload);
+
+            toast.success('✅ Prediction created on-chain!');
 
             // Reset form
             setFormData({
@@ -82,7 +110,7 @@ const CreatePredictionForm = () => {
             });
         } catch (error) {
             console.error('Error creating prediction:', error);
-            toast.error('Failed to create prediction');
+            toast.error(error.message || 'Failed to create prediction');
         } finally {
             setCreating(false);
         }
@@ -108,8 +136,8 @@ const CreatePredictionForm = () => {
                             type="button"
                             onClick={() => setFormData({ ...formData, category: 'TWITTER' })}
                             className={`p-3 sm:p-4 rounded-lg border-2 transition-all touch-manipulation ${formData.category === 'TWITTER'
-                                    ? 'border-neon-cyan bg-neon-cyan/10'
-                                    : 'border-gray-600 hover:border-gray-500 active:border-gray-400'
+                                ? 'border-neon-cyan bg-neon-cyan/10'
+                                : 'border-gray-600 hover:border-gray-500 active:border-gray-400'
                                 }`}
                         >
                             <div className="text-2xl sm:text-3xl mb-1">🐦</div>
@@ -119,8 +147,8 @@ const CreatePredictionForm = () => {
                             type="button"
                             onClick={() => setFormData({ ...formData, category: 'INK CHAIN' })}
                             className={`p-3 sm:p-4 rounded-lg border-2 transition-all touch-manipulation ${formData.category === 'INK CHAIN'
-                                    ? 'border-neon-purple bg-neon-purple/10'
-                                    : 'border-gray-600 hover:border-gray-500 active:border-gray-400'
+                                ? 'border-neon-purple bg-neon-purple/10'
+                                : 'border-gray-600 hover:border-gray-500 active:border-gray-400'
                                 }`}
                         >
                             <div className="text-2xl sm:text-3xl mb-1">⛓️</div>
@@ -180,6 +208,7 @@ const CreatePredictionForm = () => {
                                 <option value="retweet">Retweets</option>
                                 <option value="reply">Replies</option>
                                 <option value="view">Views</option>
+                                <option value="quote">Quotes</option>
                             </select>
                         </div>
                     </>
@@ -208,6 +237,9 @@ const CreatePredictionForm = () => {
                                 <option value="transactions">Total Transactions</option>
                                 <option value="tvl">TVL (USD)</option>
                                 <option value="users">Active Users</option>
+                                <option value="active_wallets">Active Wallets</option>
+                                <option value="contracts">Contracts</option>
+                                <option value="deployed_contracts">Deployed Contracts</option>
                             </select>
                         </div>
                     </>
@@ -248,6 +280,85 @@ const CreatePredictionForm = () => {
                     {creating ? 'Creating...' : '✨ Create Prediction'}
                 </button>
             </form>
+        </motion.div>
+    );
+};
+
+import ManualResolveButton from '../components/ManualResolveButton';
+import { useEffect } from 'react';
+
+const ManageMarkets = () => {
+    const [markets, setMarkets] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchMarkets = async () => {
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            const response = await axios.get(`${API_URL}/api/markets`);
+            setMarkets(response.data.markets);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching markets:', error);
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchMarkets();
+    }, []);
+
+    if (loading) return <div className="text-center py-8">Loading markets...</div>;
+
+    return (
+        <motion.div
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            className="card p-4 sm:p-6 lg:p-8 mt-8"
+        >
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold flex items-center space-x-2">
+                    <span>🛠️</span>
+                    <span>Manage Markets</span>
+                </h2>
+                <button onClick={fetchMarkets} className="text-sm text-neon-cyan hover:text-white transition-colors">
+                    🔄 Refresh
+                </button>
+            </div>
+
+            <div className="space-y-4">
+                {markets.length === 0 ? (
+                    <div className="text-gray-400 text-center py-4">No active markets found</div>
+                ) : (
+                    markets.map((market) => (
+                        <div key={market.id} className="glass p-4 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-xs font-mono bg-gray-700 px-2 py-0.5 rounded text-gray-300">
+                                        ID: {market.id}
+                                    </span>
+                                    <span className={`text-xs font-mono px-2 py-0.5 rounded ${market.resolved ? 'bg-green-900 text-green-300' : 'bg-blue-900 text-blue-300'
+                                        }`}>
+                                        {market.resolved ? 'RESOLVED' : 'ACTIVE'}
+                                    </span>
+                                </div>
+                                <div className="font-bold text-white mb-1">
+                                    Target: {market.targetMetric} {market.metricType}
+                                </div>
+                                <div className="text-xs text-gray-400 truncate max-w-md">
+                                    Tweet ID: {market.tweetId}
+                                </div>
+                            </div>
+
+                            {!market.resolved && (
+                                <ManualResolveButton
+                                    marketId={market.id}
+                                    onResolved={fetchMarkets}
+                                />
+                            )}
+                        </div>
+                    ))
+                )}
+            </div>
         </motion.div>
     );
 };

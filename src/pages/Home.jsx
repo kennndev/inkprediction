@@ -185,12 +185,12 @@ const MarketCard = ({ market, index }) => {
   const progress = (market.currentMetric / market.targetMetric) * 100;
 
   // Dynamic display info
-  const isInkChain = market.tweetId && market.tweetId.toString().startsWith('ink_');
-  const category = isInkChain ? 'INK CHAIN' : 'TWITTER';
-  const emoji = isInkChain ? '⛓️' : '🐦';
+  const isInkChain = market.category === 'INK CHAIN';
+  const category = market.category || (isInkChain ? 'INK CHAIN' : 'TWITTER');
+  const emoji = market.emoji || (isInkChain ? '⛓️' : '🐦');
 
-  // Generate a question if one isn't provided (since we removed hardcoded data)
-  const question = `Will this ${isInkChain ? 'metric' : 'tweet'} reach ${(market.targetMetric / 1000).toFixed(1)}K ${market.metricType}s?`;
+  // Use the question from the database
+  const question = market.question;
 
   return (
     <motion.div

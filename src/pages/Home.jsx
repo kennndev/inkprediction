@@ -19,31 +19,24 @@ const Home = () => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await axios.get(`${API_URL}/api/markets`);
-      console.log('Raw API Response:', response.data.markets);
-      console.log('First market RAW:', JSON.stringify(response.data.markets[0], null, 2));
-      // Convert snake_case to camelCase
+      console.log('API Response:', response.data.markets);
+
+      // Normalize the data: convert strings to numbers and handle BigNumber objects
       const markets = response.data.markets.map(market => ({
         ...market,
-        tweetId: market.tweet_id,
-        tweetUrl: market.tweet_url,
-        inkContractAddress: market.ink_contract_address,
-        inkMetricEndpoint: market.ink_metric_endpoint,
-        targetMetric: market.target_metric,
-        metricType: market.metric_type,
-        currentMetric: market.current_metric,
-        marketId: market.market_id,
-        finalMetric: market.final_metric,
-        createdAt: market.created_at,
-        createdBy: market.created_by,
-        lastVerifiedAt: market.last_verified_at,
-        yesPool: market.yes_pool || market.yesPool || 0,
-        noPool: market.no_pool || market.noPool || 0,
-        yesOdds: market.yes_odds || market.yesOdds || 5000,
-        noOdds: market.no_odds || market.noOdds || 5000
+        targetMetric: parseFloat(market.target_metric || market.targetMetric || 0),
+        currentMetric: parseFloat(market.current_metric || market.currentMetric || 0),
+        metricType: market.metric_type || market.metricType,
+        tweetId: market.tweet_id || market.tweetId,
+        tweetUrl: market.tweet_url || market.tweetUrl,
+        yesPool: parseFloat(market.yesPool || market.yes_pool || 0),
+        noPool: parseFloat(market.noPool || market.no_pool || 0),
+        // Handle BigNumber objects for odds
+        yesOdds: market.yesOdds?.hex ? parseInt(market.yesOdds.hex, 16) : parseFloat(market.yesOdds || market.yes_odds || 5000),
+        noOdds: market.noOdds?.hex ? parseInt(market.noOdds.hex, 16) : parseFloat(market.noOdds || market.no_odds || 5000),
+        deadline: market.deadline
       }));
-      console.log('Transformed Markets:', markets);
-      console.log('First market question:', markets[0]?.question);
-      console.log('First market category:', markets[0]?.category);
+
       setMarkets(markets);
       setLoading(false);
     } catch (error) {
@@ -209,13 +202,13 @@ const MarketCard = ({ market, index }) => {
   const timeLeft = getTimeLeft(market.deadline);
   const progress = (market.currentMetric / market.targetMetric) * 100;
 
-  // Dynamic display info
-  const isInkChain = market.category === 'INK CHAIN';
+  // Dynamic display info - detect Ink Chain from tweetId since backend doesn't send category
+  const isInkChain = market.tweetId && market.tweetId.toString().startsWith('ink_');
   const category = market.category || (isInkChain ? 'INK CHAIN' : 'TWITTER');
   const emoji = market.emoji || (isInkChain ? '⛓️' : '🐦');
 
-  // Use the question from the database
-  const question = market.question;
+  // Use the question from the database, or generate a fallback
+  const question = market.question || `Will this ${isInkChain ? 'metric' : 'tweet'} reach ${(market.targetMetric / 1000).toFixed(1)}K ${market.metricType}s?`;
 
   return (
     <motion.div

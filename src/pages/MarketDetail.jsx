@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAccount, useContractWrite, useWaitForTransaction, useContractRead } from 'wagmi';
 import { ethers } from 'ethers';
 // import { TwitterTweetEmbed } from 'react-twitter-embed'; // Disabled
-import { MARKET_INFO } from './Home'; // Import shared descriptions
+// import { MARKET_INFO } from './Home'; // Removed
 import confetti from 'canvas-confetti';
 import toast from 'react-hot-toast';
 import axios from 'axios';
@@ -78,12 +78,7 @@ const MarketDetail = () => {
   const [betAmount, setBetAmount] = useState('1'); // Default 1 USDC
   const [needsApproval, setNeedsApproval] = useState(true);
 
-  // Get Market Info from shared config or fallback
-  const marketInfo = MARKET_INFO?.[id] || {
-    emoji: '🎯',
-    category: 'PREDICTION',
-    question: 'Loading question...'
-  };
+  // Market info will be derived from market data after loading
 
   useEffect(() => {
     fetchMarket();
@@ -191,6 +186,14 @@ const MarketDetail = () => {
 
   const progress = (market.currentMetric / market.targetMetric) * 100;
   const potentialPayout = calculatePayout(betAmount, market);
+
+  // Dynamic Market Info
+  const isInkChain = market.tweetId && market.tweetId.toString().startsWith('ink_');
+  const marketInfo = {
+    emoji: isInkChain ? '⛓️' : '🐦',
+    category: isInkChain ? 'INK CHAIN' : 'TWITTER',
+    question: `Will this ${isInkChain ? 'metric' : 'tweet'} reach ${(market.targetMetric / 1000).toFixed(1)}K ${market.metricType}s?`
+  };
 
   return (
     <div className="min-h-screen py-8 px-4 text-white font-console tracking-wide">

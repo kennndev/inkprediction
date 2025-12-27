@@ -88,7 +88,8 @@ const MarketDetail = () => {
 
   const fetchMarket = async () => {
     try {
-      const response = await axios.get(`/api/market/${id}`);
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const response = await axios.get(`${API_URL}/api/market/${id}`);
       setMarket(response.data.market);
       setLoading(false);
     } catch (error) {

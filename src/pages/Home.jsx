@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { normalizeMarketData } from '../utils/normalizeMarketData';
+import { generateFallbackQuestion } from '../utils/formatMetricType';
 
 const Home = () => {
   const [markets, setMarkets] = useState([]);
@@ -186,13 +187,13 @@ const MarketCard = ({ market, index }) => {
   const timeLeft = getTimeLeft(market.deadline);
   const progress = (market.currentMetric / market.targetMetric) * 100;
 
-  // Dynamic display info - detect Ink Chain from tweetId since backend doesn't send category
-  const isInkChain = market.tweetId && market.tweetId.toString().startsWith('ink_');
+  // Dynamic display info - use database values or generate fallback
+  const isInkChain = market.category === 'INK CHAIN' || (market.tweetId && market.tweetId.toString().startsWith('ink_'));
   const category = market.category || (isInkChain ? 'INK CHAIN' : 'TWITTER');
   const emoji = market.emoji || (isInkChain ? '⛓️' : '🐦');
 
-  // Use the question from the database, or generate a fallback
-  const question = market.question || `Will this ${isInkChain ? 'metric' : 'tweet'} reach ${(market.targetMetric / 1000).toFixed(1)}K ${market.metricType}s?`;
+  // Use the question from the database, or generate a properly formatted fallback
+  const question = market.question || generateFallbackQuestion(market);
 
   return (
     <motion.div

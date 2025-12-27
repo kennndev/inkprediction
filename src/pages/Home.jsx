@@ -2,21 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-// import { TwitterTweetEmbed } from 'react-twitter-embed'; // Disabled - using custom display
 import toast from 'react-hot-toast';
-
-// Market descriptions - 5 Ink Chain related + 4 Twitter related
-export const MARKET_INFO = {
-  0: { emoji: '⛓️', category: 'INK CHAIN', question: 'Will Ink Chain announcement reach 5K likes?' },
-  1: { emoji: '🚀', category: 'INK CHAIN', question: 'Will Ink Sepolia testnet launch hit 10K likes?' },
-  2: { emoji: '🤝', category: 'INK CHAIN', question: 'Will Ink Chain partnership get 3K retweets?' },
-  3: { emoji: '🌐', category: 'INK CHAIN', question: 'Will Ink Chain mainnet launch reach 15K likes?' },
-  4: { emoji: '🎬', category: 'INK CHAIN', question: 'Will Ink Chain demo video hit 50K views?' },
-  5: { emoji: '🐦', category: 'TWITTER', question: 'Will Elon Musk crypto tweet reach 20K likes?' },
-  6: { emoji: '💎', category: 'TWITTER', question: 'Will Vitalik Buterin post hit 8K likes?' },
-  7: { emoji: '🔶', category: 'TWITTER', question: 'Will CZ Binance announcement get 5K retweets?' },
-  8: { emoji: '🔵', category: 'TWITTER', question: 'Will Coinbase product launch reach 12K likes?' },
-};
 
 const Home = () => {
   const [markets, setMarkets] = useState([]);
@@ -198,6 +184,14 @@ const MarketCard = ({ market, index }) => {
   const timeLeft = getTimeLeft(market.deadline);
   const progress = (market.currentMetric / market.targetMetric) * 100;
 
+  // Dynamic display info
+  const isInkChain = market.tweetId && market.tweetId.toString().startsWith('ink_');
+  const category = isInkChain ? 'INK CHAIN' : 'TWITTER';
+  const emoji = isInkChain ? '⛓️' : '🐦';
+
+  // Generate a question if one isn't provided (since we removed hardcoded data)
+  const question = `Will this ${isInkChain ? 'metric' : 'tweet'} reach ${(market.targetMetric / 1000).toFixed(1)}K ${market.metricType}s?`;
+
   return (
     <motion.div
       layout
@@ -224,16 +218,16 @@ const MarketCard = ({ market, index }) => {
           {/* Prediction Question */}
           <div className="mb-4 p-5 glass-strong rounded-2xl border-2 border-neon-purple/30">
             <div className="flex items-center space-x-3 mb-3">
-              <span className="text-3xl">{MARKET_INFO[market.id]?.emoji || '🎯'}</span>
-              <span className={`text-xs font-mono px-2 py-1 rounded ${MARKET_INFO[market.id]?.category === 'INK CHAIN'
+              <span className="text-3xl">{emoji}</span>
+              <span className={`text-xs font-mono px-2 py-1 rounded ${category === 'INK CHAIN'
                 ? 'bg-purple-900/50 text-purple-300'
                 : 'bg-blue-900/50 text-blue-300'
                 }`}>
-                {MARKET_INFO[market.id]?.category || 'PREDICTION'}
+                {category}
               </span>
             </div>
             <h3 className="text-xl font-bold text-white leading-tight">
-              {MARKET_INFO[market.id]?.question || `Will this reach ${(market.targetMetric / 1000).toFixed(1)}K ${market.metricType}s?`}
+              {question}
             </h3>
           </div>
 

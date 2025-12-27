@@ -90,24 +90,20 @@ const MarketDetail = () => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await axios.get(`${API_URL}/api/market/${id}`);
-      // Convert snake_case to camelCase
+      console.log('Market Detail Response:', response.data.market);
+
+      // Normalize the data: convert strings to numbers and handle BigNumber objects
       const market = {
         ...response.data.market,
-        tweetId: response.data.market.tweet_id,
-        tweetUrl: response.data.market.tweet_url,
-        inkContractAddress: response.data.market.ink_contract_address,
-        inkMetricEndpoint: response.data.market.ink_metric_endpoint,
-        targetMetric: response.data.market.target_metric,
-        metricType: response.data.market.metric_type,
-        currentMetric: response.data.market.current_metric,
-        marketId: response.data.market.market_id,
-        finalMetric: response.data.market.final_metric,
-        createdAt: response.data.market.created_at,
-        createdBy: response.data.market.created_by,
-        lastVerifiedAt: response.data.market.last_verified_at,
-        yesPool: response.data.market.yes_pool || response.data.market.yesPool || 0,
-        noPool: response.data.market.no_pool || response.data.market.noPool || 0
+        targetMetric: parseFloat(response.data.market.target_metric || response.data.market.targetMetric || 0),
+        currentMetric: parseFloat(response.data.market.current_metric || response.data.market.currentMetric || 0),
+        metricType: response.data.market.metric_type || response.data.market.metricType,
+        tweetId: response.data.market.tweet_id || response.data.market.tweetId,
+        tweetUrl: response.data.market.tweet_url || response.data.market.tweetUrl,
+        yesPool: parseFloat(response.data.market.yesPool || response.data.market.yes_pool || 0),
+        noPool: parseFloat(response.data.market.noPool || response.data.market.no_pool || 0)
       };
+
       setMarket(market);
       setLoading(false);
     } catch (error) {
@@ -206,12 +202,12 @@ const MarketDetail = () => {
   const progress = (market.currentMetric / market.targetMetric) * 100;
   const potentialPayout = calculatePayout(betAmount, market);
 
-  // Dynamic Market Info
-  const isInkChain = market.category === 'INK CHAIN';
+  // Dynamic Market Info - detect Ink Chain from tweetId since backend doesn't send category
+  const isInkChain = market.tweetId && market.tweetId.toString().startsWith('ink_');
   const marketInfo = {
     emoji: market.emoji || (isInkChain ? '⛓️' : '🐦'),
     category: market.category || (isInkChain ? 'INK CHAIN' : 'TWITTER'),
-    question: market.question
+    question: market.question || `Will this ${isInkChain ? 'metric' : 'tweet'} reach ${(market.targetMetric / 1000).toFixed(1)}K ${market.metricType}s?`
   };
 
   return (

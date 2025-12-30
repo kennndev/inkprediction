@@ -215,7 +215,7 @@ const MarketDetail = () => {
 
         {/* Header - Arcade Marquee */}
         <Link to="/">
-          <button className="arcade-btn bg-gray-800 px-4 py-2 mb-8 hover:bg-gray-700">
+          <button className="arcade-btn purple-box px-4 py-2 mb-8">
             ◀ BACK TO MARKETS
           </button>
         </Link>
@@ -224,8 +224,8 @@ const MarketDetail = () => {
 
           {/* LEFT: Game Screen */}
           <div className="space-y-8">
-            <div className="arcade-card pixel-border-purple p-1 bg-black">
-              <div className="p-6 bg-gray-900/50 min-h-[400px] flex flex-col justify-center items-center text-center relative overflow-hidden">
+            <div className="arcade-card pixel-border-purple p-1">
+              <div className="p-6 min-h-[400px] flex flex-col justify-center items-center text-center relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(77, 57, 93, 0.4) 0%, rgba(45, 27, 61, 0.6) 100%)' }}>
                 <div className="text-6xl mb-6 animate-bounce-subtle">{marketInfo.emoji}</div>
 
                 <h1 className="text-3xl md:text-4xl font-arcade text-shadow-neon text-white mb-8 leading-relaxed">
@@ -233,7 +233,7 @@ const MarketDetail = () => {
                 </h1>
 
                 <div className="w-full space-y-2 mb-8">
-                  <div className="flex justify-between font-arcade text-xs text-neon-cyan">
+                  <div className="flex justify-between font-arcade text-xs text-neon-purple">
                     <span>Current: {(market.currentMetric / 1000).toFixed(1)}K</span>
                     <span>Target: {(market.targetMetric / 1000).toFixed(1)}K</span>
                   </div>
@@ -254,11 +254,11 @@ const MarketDetail = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 w-full text-center">
-                  <div className="bg-gray-800 p-4 border-2 border-green-500/30">
+                  <div className="purple-box p-4 border-2 border-green-500/30">
                     <div className="text-green-400 font-arcade text-xs mb-1">YES POOL</div>
                     <div className="text-2xl font-bold">{market.yesPool} USDC</div>
                   </div>
-                  <div className="bg-gray-800 p-4 border-2 border-red-500/30">
+                  <div className="purple-box p-4 border-2 border-red-500/30">
                     <div className="text-red-400 font-arcade text-xs mb-1">NO POOL</div>
                     <div className="text-2xl font-bold">{market.noPool} USDC</div>
                   </div>
@@ -269,10 +269,10 @@ const MarketDetail = () => {
 
           {/* RIGHT: Control Deck */}
           <div className="relative">
-            <div className="arcade-card p-8 bg-gray-900 bg-opacity-95 border-4 border-gray-700">
+            <div className="arcade-card p-8">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-arcade text-neon-yellow mb-2">PLACE PREDICTION</h2>
-                <div className="h-1 w-full bg-neon-pink"></div>
+                <div className="h-1 w-full bg-neon-purple"></div>
               </div>
 
               {/* Bet Input First */}
@@ -283,7 +283,7 @@ const MarketDetail = () => {
                     type="number"
                     value={betAmount}
                     onChange={(e) => setBetAmount(e.target.value)}
-                    className="w-full bg-black border-2 border-gray-600 text-neon-green font-arcade text-2xl p-4 text-center focus:border-neon-pink focus:outline-none"
+                    className="w-full input-purple text-neon-green font-arcade text-2xl p-4 text-center"
                   />
                   <div className="absolute right-4 top-5 text-gray-500 font-arcade text-xs">USDC</div>
                 </div>
@@ -293,7 +293,7 @@ const MarketDetail = () => {
                     <button
                       key={amt}
                       onClick={() => setBetAmount(amt === 'MAX' ? '1000' : amt)}
-                      className="bg-gray-800 hover:bg-gray-700 text-white font-arcade text-xs px-3 py-2 border border-gray-600"
+                      className="purple-box text-white font-arcade text-xs px-3 py-2"
                     >
                       {amt}
                     </button>
@@ -335,7 +335,7 @@ const MarketDetail = () => {
               </div>
 
               {potentialPayout !== '0' && (
-                <div className="text-center font-arcade text-sm text-neon-cyan p-4 bg-black/50 rounded-lg border border-neon-cyan/30">
+                <div className="text-center font-arcade text-sm text-neon-purple p-4 purple-box rounded-lg">
                   POTENTIAL WIN: {potentialPayout} USDC
                 </div>
               )}

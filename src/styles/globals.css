@@ -10,50 +10,27 @@
   --neon-cyan: #06B6D4;
   --neon-green: #39FF14;
   --neon-yellow: #FDE047;
-  --dark-bg: #0B0C15;
-  --grid-color: rgba(168, 85, 247, 0.2);
+  --dark-bg: #1a0b2e;
+  --dark-bg-secondary: #2d1b3d;
+  --grid-color: rgba(168, 85, 247, 0.3);
 }
 
 body {
   margin: 0;
   font-family: 'VT323', monospace; /* Default to retro console font */
-  background-color: var(--dark-bg);
+  background: linear-gradient(135deg, #1a0b2e 0%, #2d1b3d 50%, #1a0b2e 100%);
+  background-attachment: fixed;
   color: #fff;
   overflow-x: hidden;
   font-size: 18px; /* Slightly larger for pixel fonts */
 }
 
 /* =========================================
-   SYNTHWAVE GRID BACKGROUND
+   SYNTHWAVE GRID BACKGROUND - DISABLED
    ========================================= */
-.bg-grid {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-image: 
-    linear-gradient(var(--grid-color) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-position: center bottom;
-  perspective: 500px;
-  transform-style: preserve-3d;
-  z-index: -2;
-}
+/* Grid background removed for cleaner look */
 
-.bg-grid::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to bottom, var(--dark-bg) 0%, transparent 40%, var(--dark-bg) 95%);
-  z-index: -1;
-}
-
-/* Sun in the horizon */
+/* Sun in the horizon - Purple theme */
 .retro-sun {
   position: fixed;
   bottom: 20%;
@@ -61,9 +38,9 @@ body {
   transform: translateX(-50%);
   width: 400px;
   height: 400px;
-  background: linear-gradient(to bottom, #FF2D95, #FDE047);
+  background: linear-gradient(to bottom, #C084FC, #9333EA);
   border-radius: 50%;
-  box-shadow: 0 0 100px var(--neon-pink);
+  box-shadow: 0 0 100px var(--neon-purple);
   z-index: -3;
   clip-path: polygon(0 0, 100% 0, 100% 60%, 0 60%);
 }
@@ -89,14 +66,50 @@ h1, h2, h3, h4, .font-arcade {
 }
 
 .text-shadow-neon {
-  text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-purple);
+  text-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple);
 }
 
 .text-gradient-arcade {
-  background: linear-gradient(180deg, #FDE047 0%, #FF2D95 100%);
+  background: linear-gradient(180deg, #C084FC 0%, #A855F7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 5px rgba(255, 45, 149, 0.5));
+  filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.5));
+}
+
+/* Purple-themed gradient classes */
+.text-gradient-cyber {
+  background: linear-gradient(135deg, #C084FC 0%, #A855F7 50%, #9333EA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.text-gradient-purple {
+  background: linear-gradient(135deg, #C084FC 0%, #A855F7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-pink {
+  background: linear-gradient(135deg, #EC4899 0%, #A855F7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #A855F7 0%, #9333EA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 /* =========================================
@@ -140,15 +153,15 @@ h1, h2, h3, h4, .font-arcade {
 }
 
 /* =========================================
-   CRT / CARD STYLES
+   CRT / CARD STYLES - Purple theme
    ========================================= */
 .arcade-card {
-  background: rgba(16, 16, 24, 0.9);
-  border: 4px solid #2d2d2d;
+  background: linear-gradient(135deg, rgba(77, 57, 93, 0.9) 0%, rgba(45, 27, 61, 0.95) 100%);
+  border: 4px solid rgba(168, 85, 247, 0.4);
   border-radius: 4px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
 }
 
 /* Pixel Border Effect */
@@ -217,8 +230,161 @@ h1, h2, h3, h4, .font-arcade {
    UTILITIES
    ========================================= */
 .glass-strong {
-  /* Overriding glass for arcade to look more like plastic/metal */
-  background: rgba(20, 20, 30, 0.95);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
+  /* Purple-tinted glass with less blur */
+  background: linear-gradient(135deg, rgba(77, 57, 93, 0.8) 0%, rgba(45, 27, 61, 0.95) 100%);
+  border: 2px solid rgba(168, 85, 247, 0.25);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(168, 85, 247, 0.2);
+}
+
+/* Purple-themed button */
+.btn-primary {
+  @apply px-6 py-3 rounded-lg font-medium transition-all duration-300;
+  background: linear-gradient(135deg, #C084FC 0%, #A855F7 50%, #9333EA 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+/* Glass effect - Purple tinted with minimal blur */
+.glass {
+  background: rgba(168, 85, 247, 0.08);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.1);
+}
+
+.glass:hover {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+/* Card styling - Purple theme */
+.card {
+  @apply rounded-2xl p-6;
+  background: linear-gradient(135deg, rgba(77, 57, 93, 0.6) 0%, rgba(45, 27, 61, 0.8) 100%);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  box-shadow: 0 8px 32px rgba(168, 85, 247, 0.15);
+}
+
+/* Market card - Enhanced purple */
+.market-card {
+  @apply card;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, rgba(77, 57, 93, 0.5) 0%, rgba(45, 27, 61, 0.7) 100%);
+  border: 2px solid rgba(168, 85, 247, 0.25);
+}
+
+.market-card:hover {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.3) 0%, rgba(77, 57, 93, 0.8) 100%);
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 12px 40px rgba(168, 85, 247, 0.3);
+  transform: translateY(-5px);
+}
+
+/* Progress bar */
+.progress-bar {
+  @apply w-full h-3 bg-gray-800 rounded-full overflow-hidden;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.progress-fill {
+  @apply h-full rounded-full transition-all duration-500;
+  background: linear-gradient(90deg, #C084FC 0%, #A855F7 50%, #9333EA 100%);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
+
+/* Glow effects */
+.glow-purple {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.5), 0 0 40px rgba(168, 85, 247, 0.3);
+}
+
+/* Purple-themed input fields */
+.input-purple {
+  background: linear-gradient(135deg, rgba(77, 57, 93, 0.6) 0%, rgba(45, 27, 61, 0.8) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  transition: all 0.3s ease;
+}
+
+.input-purple:focus {
+  background: linear-gradient(135deg, rgba(77, 57, 93, 0.8) 0%, rgba(45, 27, 61, 0.9) 100%);
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+  outline: none;
+}
+
+/* Purple box for stats/info */
+.purple-box {
+  background: linear-gradient(135deg, rgba(77, 57, 93, 0.5) 0%, rgba(45, 27, 61, 0.7) 100%);
+  border: 2px solid rgba(168, 85, 247, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Purple box hover */
+.purple-box:hover {
+  background: linear-gradient(135deg, rgba(77, 57, 93, 0.7) 0%, rgba(45, 27, 61, 0.85) 100%);
+  border-color: rgba(168, 85, 247, 0.5);
+}
+
+/* Cyber grid background - disabled */
+.cyber-grid-bg {
+  position: relative;
+}
+
+/* Purple skeleton loaders */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(77, 57, 93, 0.4) 0%,
+    rgba(168, 85, 247, 0.2) 50%,
+    rgba(77, 57, 93, 0.4) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeleton-text {
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    rgba(77, 57, 93, 0.4) 0%,
+    rgba(168, 85, 247, 0.2) 50%,
+    rgba(77, 57, 93, 0.4) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }

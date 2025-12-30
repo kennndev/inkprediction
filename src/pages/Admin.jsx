@@ -226,6 +226,8 @@ const CreatePredictionForm = () => {
                             >
                                 <option value="transactions">Total Transactions</option>
                                 <option value="tvl">TVL (USD)</option>
+                                <option value="gas_price">Gas Price</option>
+                                <option value="block_number">Block Number</option>
                                 <option value="users">Active Users</option>
                                 <option value="active_wallets">Active Wallets</option>
                                 <option value="contracts">Contracts</option>

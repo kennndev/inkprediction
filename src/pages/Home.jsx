@@ -51,28 +51,17 @@ const Home = () => {
       className="min-h-screen py-8 px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-6xl mx-auto">
-        {/* Hero Section */}
-        <motion.div
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-center mb-12 relative rounded-3xl overflow-hidden"
-        >
-          {/* Background Image */}
-          <div
-            className="absolute inset-0 z-0"
-            style={{
-              backgroundImage: 'url(/video-bg.webp)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              opacity: 0.15
-            }}
-          />
-
-          {/* Content */}
-          <div className="relative z-10 py-16 px-8">
+        {/* Hero Section - Responsive Layout */}
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 mb-12">
+          {/* Content - Left on Desktop, Top on Mobile */}
+          <motion.div
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="flex-1 text-center lg:text-left order-2 lg:order-1"
+          >
             <motion.h1
-              className="text-display font-display font-bold text-gradient-cyber mb-4"
+              className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-bold text-gradient-cyber mb-4"
               animate={{
                 backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
               }}
@@ -80,63 +69,30 @@ const Home = () => {
             >
               Predict the Viral 🚀
             </motion.h1>
-            <p className="text-xl text-gray-300 mb-8">
+            <p className="text-lg sm:text-xl text-gray-300">
               Bet on whether crypto tweets will hit their targets
             </p>
+          </motion.div>
 
-            {/* Stats Bar */}
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="flex justify-center items-center space-x-8 mb-8"
-            >
-              <StatCard
-                icon="📊"
-                label="Active Markets"
-                value={markets.length}
-                delay={0.5}
-              />
-              <StatCard
-                icon="💰"
-                label="Total Volume"
-                value={`${calculateTotalVolume(markets)} USDC`}
-                delay={0.6}
-              />
-              <StatCard
-                icon="👥"
-                label="Predictions"
-                value="1.2K+"
-                delay={0.7}
-              />
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* Filter Tabs */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="flex justify-center space-x-4 mb-8"
-        >
-          {['all', 'ending-soon', 'popular'].map((f) => (
-            <motion.button
-              key={f}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setFilter(f)}
-              className={`px-6 py-3 rounded-full font-medium transition-all ${filter === f
-                ? 'bg-gradient-to-r from-neon-pink to-neon-purple text-white glow-purple'
-                : 'glass hover:glass-strong'
-                }`}
-            >
-              {f === 'all' && '🎯 All Markets'}
-              {f === 'ending-soon' && '⏰ Ending Soon'}
-              {f === 'popular' && '🔥 Popular'}
-            </motion.button>
-          ))}
-        </motion.div>
+          {/* Image - Right on Desktop, Top on Mobile */}
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="flex-1 w-full order-1 lg:order-2"
+          >
+            <div
+              className="w-full rounded-3xl overflow-hidden"
+              style={{
+                height: '300px',
+                backgroundImage: 'url(/hawaii.png)',
+                backgroundSize: 'contain',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }}
+            />
+          </motion.div>
+        </div>
 
         {/* Markets Grid */}
         {loading ? (
@@ -163,24 +119,6 @@ const Home = () => {
     </motion.div>
   );
 };
-
-const StatCard = ({ icon, label, value, delay }) => (
-  <motion.div
-    initial={{ scale: 0, rotate: -180 }}
-    animate={{ scale: 1, rotate: 0 }}
-    transition={{
-      type: 'spring',
-      stiffness: 200,
-      damping: 15,
-      delay
-    }}
-    className="glass-strong rounded-2xl px-6 py-4 text-center"
-  >
-    <div className="text-3xl mb-2">{icon}</div>
-    <div className="text-2xl font-bold text-gradient-pink mb-1">{value}</div>
-    <div className="text-sm text-gray-400">{label}</div>
-  </motion.div>
-);
 
 const MarketCard = ({ market, index }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -287,7 +225,7 @@ const MarketCard = ({ market, index }) => {
               <span className="text-2xl">⏰</span>
               <div>
                 <div className="text-xs text-gray-400">Ends in</div>
-                <div className="text-lg font-bold text-gradient-cyan">
+                <div className="text-lg font-bold text-gradient-purple">
                   {timeLeft}
                 </div>
               </div>
@@ -396,14 +334,6 @@ const getTimeLeft = (deadline) => {
   }
 
   return `${hours}h ${minutes}m`;
-};
-
-const calculateTotalVolume = (markets) => {
-  return markets
-    .reduce((total, market) => {
-      return total + parseFloat(market.yesPool) + parseFloat(market.noPool);
-    }, 0)
-    .toFixed(2);
 };
 
 export default Home;

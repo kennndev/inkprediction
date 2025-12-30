@@ -46,7 +46,7 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
 );
 
 const { connectors } = getDefaultWallets({
-  appName: 'InkPredict',
+  appName: 'Boink Prediction',
   projectId: 'e286deb6f044672a9e94ddd202467bbd', // Get from WalletConnect
   chains,
 });
@@ -71,7 +71,11 @@ function App() {
         })}
       >
         <Router>
-          <div className="relative min-h-screen bg-dark-900 cyber-grid-bg">
+          <div className="relative min-h-screen cyber-grid-bg" style={{
+            background: 'linear-gradient(135deg, #1a0b2e 0%, #2d1b3d 30%, #1a0b2e 60%, #2d1b3d 100%)',
+            backgroundAttachment: 'fixed',
+            minHeight: '100vh'
+          }}>
             {/* Particle background */}
             <ParticleBackground />
 

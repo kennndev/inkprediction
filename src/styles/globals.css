@@ -331,6 +331,7 @@ h1, h2, h3, h4, .font-arcade {
   background: linear-gradient(135deg, rgba(77, 57, 93, 0.6) 0%, rgba(45, 27, 61, 0.8) 100%);
   border: 1px solid rgba(168, 85, 247, 0.3);
   transition: all 0.3s ease;
+  color: #ffffff;
 }
 
 .input-purple:focus {
@@ -338,6 +339,17 @@ h1, h2, h3, h4, .font-arcade {
   border-color: rgba(168, 85, 247, 0.6);
   box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
   outline: none;
+}
+
+/* Style for select dropdown options */
+.input-purple option {
+  background: #2d1b3d;
+  color: #ffffff;
+  padding: 10px;
+}
+
+.input-purple option:hover {
+  background: #4d395d;
 }
 
 /* Purple box for stats/info */

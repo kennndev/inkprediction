@@ -49,7 +49,7 @@ const Leaderboard = () => {
             Leaderboard 🏆
           </h1>
           <p className="text-xl text-gray-300">
-            Top predictors on InkPredict
+            Top predictors on Boink Prediction
           </p>
         </motion.div>
 

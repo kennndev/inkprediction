@@ -284,11 +284,13 @@ const ManageMarkets = () => {
     const fetchMarkets = async () => {
         try {
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-            const response = await axios.get(`${API_URL}/api/markets`);
+            // Use admin endpoint to get all unresolved markets including expired ones
+            const response = await axios.get(`${API_URL}/api/admin/markets`);
             setMarkets(response.data.markets);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching markets:', error);
+            toast.error('Failed to load markets');
             setLoading(false);
         }
     };
@@ -298,6 +300,10 @@ const ManageMarkets = () => {
     }, []);
 
     if (loading) return <div className="text-center py-8">Loading markets...</div>;
+
+    // Separate markets into active and expired
+    const activeMarkets = markets.filter(m => !m.expired);
+    const expiredMarkets = markets.filter(m => m.expired);
 
     return (
         <motion.div
@@ -315,39 +321,124 @@ const ManageMarkets = () => {
                 </button>
             </div>
 
-            <div className="space-y-4">
-                {markets.length === 0 ? (
-                    <div className="text-gray-400 text-center py-4">No active markets found</div>
-                ) : (
-                    markets.map((market) => (
-                        <div key={market.id} className="glass p-4 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-xs font-mono bg-gray-700 px-2 py-0.5 rounded text-gray-300">
-                                        ID: {market.id}
-                                    </span>
-                                    <span className={`text-xs font-mono px-2 py-0.5 rounded ${market.resolved ? 'bg-green-900 text-green-300' : 'bg-blue-900 text-blue-300'
-                                        }`}>
-                                        {market.resolved ? 'RESOLVED' : 'ACTIVE'}
-                                    </span>
+            {/* Expired Unresolved Markets Section */}
+            {expiredMarkets.length > 0 && (
+                <div className="mb-8">
+                    <div className="flex items-center gap-2 mb-4">
+                        <span className="text-lg font-bold text-red-400">⚠️ Expired & Unresolved</span>
+                        <span className="text-xs bg-red-900/30 text-red-300 px-2 py-1 rounded">
+                            {expiredMarkets.length} need resolution
+                        </span>
+                    </div>
+                    <div className="space-y-4">
+                        {expiredMarkets.map((market) => (
+                            <div key={market.id} className="glass p-4 rounded-lg border-2 border-red-500/50 bg-red-900/10 flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-xs font-mono bg-gray-700 px-2 py-0.5 rounded text-gray-300">
+                                            ID: {market.id}
+                                        </span>
+                                        <span className="text-xs font-mono px-2 py-0.5 rounded bg-red-900 text-red-300">
+                                            EXPIRED
+                                        </span>
+                                        {market.category && (
+                                            <span className="text-xs font-mono px-2 py-0.5 rounded bg-purple-900 text-purple-300">
+                                                {market.category}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {market.question && (
+                                        <div className="font-bold text-white mb-1">
+                                            {market.emoji} {market.question}
+                                        </div>
+                                    )}
+                                    <div className="text-sm text-gray-300 mb-1">
+                                        Target: {market.targetMetric} {market.metricType}
+                                        {market.currentMetric !== undefined && (
+                                            <span className="ml-2 text-gray-400">
+                                                (Current: {market.currentMetric})
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="text-xs text-gray-400 truncate max-w-md">
+                                        {market.tweetId && `Tweet ID: ${market.tweetId}`}
+                                        {market.tweetUrl && (
+                                            <a href={market.tweetUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-neon-cyan hover:underline">
+                                                View Tweet
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="font-bold text-white mb-1">
-                                    Target: {market.targetMetric} {market.metricType}
-                                </div>
-                                <div className="text-xs text-gray-400 truncate max-w-md">
-                                    Tweet ID: {market.tweetId}
-                                </div>
-                            </div>
 
-                            {!market.resolved && (
                                 <ManualResolveButton
                                     marketId={market.id}
                                     onResolved={fetchMarkets}
                                 />
-                            )}
-                        </div>
-                    ))
-                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Active Markets Section */}
+            <div>
+                <div className="flex items-center gap-2 mb-4">
+                    <span className="text-lg font-bold text-gray-300">Active Markets</span>
+                    <span className="text-xs bg-blue-900/30 text-blue-300 px-2 py-1 rounded">
+                        {activeMarkets.length}
+                    </span>
+                </div>
+                <div className="space-y-4">
+                    {activeMarkets.length === 0 ? (
+                        <div className="text-gray-400 text-center py-4">No active markets found</div>
+                    ) : (
+                        activeMarkets.map((market) => (
+                            <div key={market.id} className="glass p-4 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-xs font-mono bg-gray-700 px-2 py-0.5 rounded text-gray-300">
+                                            ID: {market.id}
+                                        </span>
+                                        <span className="text-xs font-mono px-2 py-0.5 rounded bg-blue-900 text-blue-300">
+                                            ACTIVE
+                                        </span>
+                                        {market.category && (
+                                            <span className="text-xs font-mono px-2 py-0.5 rounded bg-purple-900 text-purple-300">
+                                                {market.category}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {market.question && (
+                                        <div className="font-bold text-white mb-1">
+                                            {market.emoji} {market.question}
+                                        </div>
+                                    )}
+                                    <div className="text-sm text-gray-300 mb-1">
+                                        Target: {market.targetMetric} {market.metricType}
+                                        {market.currentMetric !== undefined && (
+                                            <span className="ml-2 text-gray-400">
+                                                (Current: {market.currentMetric})
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="text-xs text-gray-400 truncate max-w-md">
+                                        {market.tweetId && `Tweet ID: ${market.tweetId}`}
+                                        {market.tweetUrl && (
+                                            <a href={market.tweetUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-neon-cyan hover:underline">
+                                                View Tweet
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <ManualResolveButton
+                                    marketId={market.id}
+                                    onResolved={fetchMarkets}
+                                />
+                            </div>
+                        ))
+                    )}
+                </div>
             </div>
         </motion.div>
     );

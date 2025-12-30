@@ -126,7 +126,7 @@ const CreatePredictionForm = () => {
                             type="button"
                             onClick={() => setFormData({ ...formData, category: 'TWITTER' })}
                             className={`p-3 sm:p-4 rounded-lg border-2 transition-all touch-manipulation ${formData.category === 'TWITTER'
-                                ? 'border-neon-cyan bg-neon-cyan/10'
+                                ? 'border-neon-purple bg-neon-purple/10'
                                 : 'border-gray-600 hover:border-gray-500 active:border-gray-400'
                                 }`}
                         >
@@ -154,7 +154,7 @@ const CreatePredictionForm = () => {
                         value={formData.question}
                         onChange={(e) => setFormData({ ...formData, question: e.target.value })}
                         placeholder="Will Vitalik's tweet reach 10K likes?"
-                        className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2.5 text-sm sm:text-base focus:border-neon-cyan focus:outline-none resize-none"
+                        className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base resize-none"
                         rows="2"
                         required
                     />
@@ -168,7 +168,7 @@ const CreatePredictionForm = () => {
                         value={formData.emoji}
                         onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
                         placeholder="🎯"
-                        className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2.5 text-sm sm:text-base focus:border-neon-cyan focus:outline-none"
+                        className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
                         maxLength={2}
                     />
                 </div>
@@ -183,7 +183,7 @@ const CreatePredictionForm = () => {
                                 value={formData.tweetUrl}
                                 onChange={(e) => setFormData({ ...formData, tweetUrl: e.target.value })}
                                 placeholder="https://twitter.com/user/status/123..."
-                                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2.5 text-sm sm:text-base focus:border-neon-cyan focus:outline-none"
+                                className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
                                 required={formData.category === 'TWITTER'}
                             />
                         </div>
@@ -192,7 +192,7 @@ const CreatePredictionForm = () => {
                             <select
                                 value={formData.metricType}
                                 onChange={(e) => setFormData({ ...formData, metricType: e.target.value })}
-                                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2.5 text-sm sm:text-base focus:border-neon-cyan focus:outline-none"
+                                className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
                             >
                                 <option value="like">Likes</option>
                                 <option value="retweet">Retweets</option>
@@ -214,7 +214,7 @@ const CreatePredictionForm = () => {
                                 value={formData.inkContractAddress}
                                 onChange={(e) => setFormData({ ...formData, inkContractAddress: e.target.value })}
                                 placeholder="0x..."
-                                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2.5 text-sm sm:text-base focus:border-neon-cyan focus:outline-none"
+                                className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
                             />
                         </div>
                         <div>
@@ -222,7 +222,7 @@ const CreatePredictionForm = () => {
                             <select
                                 value={formData.metricType}
                                 onChange={(e) => setFormData({ ...formData, metricType: e.target.value })}
-                                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2.5 text-sm sm:text-base focus:border-neon-cyan focus:outline-none"
+                                className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
                             >
                                 <option value="transactions">Total Transactions</option>
                                 <option value="tvl">TVL (USD)</option>
@@ -243,7 +243,7 @@ const CreatePredictionForm = () => {
                         value={formData.targetMetric}
                         onChange={(e) => setFormData({ ...formData, targetMetric: e.target.value })}
                         placeholder="10000"
-                        className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2.5 text-sm sm:text-base focus:border-neon-cyan focus:outline-none"
+                        className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
                         required
                     />
                 </div>
@@ -256,7 +256,7 @@ const CreatePredictionForm = () => {
                         value={formData.durationHours}
                         onChange={(e) => setFormData({ ...formData, durationHours: e.target.value })}
                         placeholder="24"
-                        className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2.5 text-sm sm:text-base focus:border-neon-cyan focus:outline-none"
+                        className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
                         required
                     />
                 </div>
@@ -316,7 +316,7 @@ const ManageMarkets = () => {
                     <span>🛠️</span>
                     <span>Manage Markets</span>
                 </h2>
-                <button onClick={fetchMarkets} className="text-sm text-neon-cyan hover:text-white transition-colors">
+                <button onClick={fetchMarkets} className="text-sm text-neon-purple hover:text-white transition-colors">
                     🔄 Refresh
                 </button>
             </div>
@@ -335,7 +335,7 @@ const ManageMarkets = () => {
                             <div key={market.id} className="glass p-4 rounded-lg border-2 border-red-500/50 bg-red-900/10 flex flex-col sm:flex-row justify-between items-center gap-4">
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-xs font-mono bg-gray-700 px-2 py-0.5 rounded text-gray-300">
+                                        <span className="text-xs font-mono bg-purple-900/50 px-2 py-0.5 rounded text-purple-200">
                                             ID: {market.id}
                                         </span>
                                         <span className="text-xs font-mono px-2 py-0.5 rounded bg-red-900 text-red-300">
@@ -363,7 +363,7 @@ const ManageMarkets = () => {
                                     <div className="text-xs text-gray-400 truncate max-w-md">
                                         {market.tweetId && `Tweet ID: ${market.tweetId}`}
                                         {market.tweetUrl && (
-                                            <a href={market.tweetUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-neon-cyan hover:underline">
+                                            <a href={market.tweetUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-neon-purple hover:underline">
                                                 View Tweet
                                             </a>
                                         )}
@@ -396,7 +396,7 @@ const ManageMarkets = () => {
                             <div key={market.id} className="glass p-4 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-xs font-mono bg-gray-700 px-2 py-0.5 rounded text-gray-300">
+                                        <span className="text-xs font-mono bg-purple-900/50 px-2 py-0.5 rounded text-purple-200">
                                             ID: {market.id}
                                         </span>
                                         <span className="text-xs font-mono px-2 py-0.5 rounded bg-blue-900 text-blue-300">
@@ -424,7 +424,7 @@ const ManageMarkets = () => {
                                     <div className="text-xs text-gray-400 truncate max-w-md">
                                         {market.tweetId && `Tweet ID: ${market.tweetId}`}
                                         {market.tweetUrl && (
-                                            <a href={market.tweetUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-neon-cyan hover:underline">
+                                            <a href={market.tweetUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-neon-purple hover:underline">
                                                 View Tweet
                                             </a>
                                         )}

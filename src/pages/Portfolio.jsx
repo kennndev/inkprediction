@@ -79,7 +79,7 @@ const Portfolio = () => {
             icon="📊"
             label="Total Bets"
             value={bets.length}
-            gradient="from-neon-pink to-neon-purple"
+            gradient="from-purple-500 to-purple-700"
             delay={0.1}
           />
           <StatCard
@@ -93,7 +93,7 @@ const Portfolio = () => {
             icon="💰"
             label="Total Bet"
             value={`${stats.totalBet.toFixed(2)} USDC`}
-            gradient="from-neon-cyan to-blue-500"
+            gradient="from-purple-500 to-purple-700"
             delay={0.3}
           />
           <StatCard
@@ -116,7 +116,7 @@ const Portfolio = () => {
             <h2 className="text-2xl font-bold mb-4 flex items-center space-x-2">
               <span>🔥</span>
               <span>Active Bets</span>
-              <span className="text-neon-pink">({activeBets.length})</span>
+              <span className="text-neon-purple">({activeBets.length})</span>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {activeBets.map((bet, index) => (
@@ -210,7 +210,7 @@ const BetCard = ({ bet, index }) => (
       </div>
 
       <div className="mt-4 text-center">
-        <span className="text-neon-cyan">⏳ Waiting for resolution...</span>
+        <span className="text-neon-purple">⏳ Waiting for resolution...</span>
       </div>
     </Link>
   </motion.div>

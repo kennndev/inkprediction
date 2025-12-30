@@ -56,7 +56,7 @@ const Navbar = () => {
               className="text-2xl font-display font-bold text-gradient-cyber"
               whileHover={{ scale: 1.05 }}
             >
-              InkPredict
+              Boink Prediction
             </motion.span>
           </Link>
 
@@ -70,7 +70,7 @@ const Navbar = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${isActive
-                      ? 'bg-gradient-to-r from-neon-pink to-neon-purple text-white shadow-lg glow-purple'
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-lg glow-purple'
                       : 'glass hover:glass-strong'
                       }`}
                   >
@@ -170,7 +170,7 @@ const MobileMenu = ({ navItems }) => {
                 <motion.div
                   whileTap={{ scale: 0.95 }}
                   className={`p-4 rounded-2xl font-medium transition-all ${isActive
-                    ? 'bg-gradient-to-r from-neon-pink to-neon-purple text-white'
+                    ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white'
                     : 'glass hover:glass-strong'
                     }`}
                 >

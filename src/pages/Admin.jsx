@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const ADMIN_WALLET = '0x21A5625Fc19469c11555B5607eDB2B97324e7D82';
+const ADMIN_WALLET = import.meta.env.VITE_ADMIN_WALLET || '';
 
 const Admin = () => {
     const { address, isConnected } = useAccount();

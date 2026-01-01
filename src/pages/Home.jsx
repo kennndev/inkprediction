@@ -9,11 +9,11 @@ import { generateFallbackQuestion } from '../utils/formatMetricType';
 const Home = () => {
   const [markets, setMarkets] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, ending-soon, popular
+  const [filter, setFilter] = useState('all'); 
 
   useEffect(() => {
     fetchMarkets();
-    const interval = setInterval(fetchMarkets, 30000); // Refresh every 30s
+    const interval = setInterval(fetchMarkets, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -38,7 +38,7 @@ const Home = () => {
     }
     if (filter === 'popular') {
       const totalPool = parseFloat(market.yesPool) + parseFloat(market.noPool);
-      return totalPool > 1; // More than 1 ETH
+      return totalPool > 1; 
     }
     return true;
   });

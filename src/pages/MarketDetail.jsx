@@ -79,6 +79,7 @@ const MarketDetail = () => {
   const [loading, setLoading] = useState(true);
   const [betAmount, setBetAmount] = useState('1'); // Default 1 USDC
   const [needsApproval, setNeedsApproval] = useState(true);
+  const [lastBetPosition, setLastBetPosition] = useState(null); // Track bet position for DB recording
 
   // Market info will be derived from market data after loading
 
@@ -103,6 +104,24 @@ const MarketDetail = () => {
       console.error('Error fetching market:', error);
       toast.error('Failed to load market');
       setLoading(false);
+    }
+  };
+
+  // Record bet in database after successful blockchain transaction
+  const recordBetInDatabase = async (marketId, amount, position, txHash) => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      await axios.post(`${API_URL}/api/user/bet`, {
+        userAddress: address,
+        marketId: marketId,
+        amount: amount,
+        position: position,
+        transactionHash: txHash
+      });
+      console.log('✅ Bet recorded in database');
+    } catch (error) {
+      console.error('Failed to record bet in database:', error);
+      // Don't show error to user - bet is already on blockchain
     }
   };
 
@@ -160,9 +179,20 @@ const MarketDetail = () => {
 
   const { isLoading: isBetting } = useWaitForTransaction({
     hash: betData?.hash,
-    onSuccess: () => {
+    onSuccess: (data) => {
       triggerConfetti();
       toast.success('🎉 Bet Placed Successfully!');
+
+      // Record bet in database
+      if (lastBetPosition !== null) {
+        recordBetInDatabase(
+          id,
+          betAmount,
+          lastBetPosition,
+          data.transactionHash
+        );
+      }
+
       fetchMarket();
     },
   });
@@ -170,6 +200,9 @@ const MarketDetail = () => {
   const handleAction = (isYes) => {
     if (!isConnected) return toast.error('Connect Wallet First');
     if (!betAmount || parseFloat(betAmount) < 1) return toast.error('Min bet is 1 USDC');
+
+    // Store position for database recording after successful transaction
+    setLastBetPosition(isYes);
 
     if (needsApproval) {
       toast('Approving USDC first...', { icon: '🔓' });

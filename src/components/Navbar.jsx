@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 
-const ADMIN_WALLET = '0x21A5625Fc19469c11555B5607eDB2B97324e7D82';
+const ADMIN_WALLET = import.meta.env.VITE_ADMIN_WALLET || '';
 
 const Navbar = () => {
   const location = useLocation();
@@ -48,9 +48,9 @@ const Navbar = () => {
             <motion.div
               whileHover={{ scale: 1.1 }}
               transition={{ duration: 0.3 }}
-              className="text-3xl"
+              className="w-12 h-12"
             >
-              📈
+              <img src="/logo.png" alt="Boink Prediction Logo" className="w-full h-full object-contain" />
             </motion.div>
             <motion.span
               className="text-2xl font-display font-bold text-gradient-cyber"

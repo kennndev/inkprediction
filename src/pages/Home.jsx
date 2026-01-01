@@ -79,18 +79,29 @@ const Home = () => {
             initial={{ x: 50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="flex-1 w-full order-1 lg:order-2"
+            whileHover={{ scale: 1.05, rotate: 1 }}
+            className="flex-1 w-full order-1 lg:order-2 max-w-md lg:max-w-lg mx-auto"
           >
             <div
-              className="w-full rounded-3xl overflow-hidden"
+              className="w-full rounded-3xl overflow-hidden glass-strong border-2 border-purple-500/30 shadow-2xl"
               style={{
                 height: '300px',
                 backgroundImage: 'url(/hawaii.png)',
                 backgroundSize: 'contain',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
+                boxShadow: '0 0 40px rgba(168, 85, 247, 0.3), 0 20px 60px rgba(0, 0, 0, 0.5)',
               }}
-            />
+            >
+              {/* Desktop: Larger size */}
+              <style>{`
+                @media (min-width: 1024px) {
+                  .flex-1.order-1.lg\\:order-2 > div {
+                    height: 400px !important;
+                  }
+                }
+              `}</style>
+            </div>
           </motion.div>
         </div>
 

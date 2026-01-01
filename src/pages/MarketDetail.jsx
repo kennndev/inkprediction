@@ -111,16 +111,31 @@ const MarketDetail = () => {
   const recordBetInDatabase = async (marketId, amount, position, txHash) => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      await axios.post(`${API_URL}/api/user/bet`, {
+      console.log('📤 Sending bet to database:', {
+        API_URL,
+        userAddress: address,
+        marketId,
+        amount,
+        position,
+        txHash
+      });
+
+      const response = await axios.post(`${API_URL}/api/user/bet`, {
         userAddress: address,
         marketId: marketId,
         amount: amount,
         position: position,
         transactionHash: txHash
       });
-      console.log('✅ Bet recorded in database');
+
+      console.log('✅ Bet recorded in database:', response.data);
     } catch (error) {
-      console.error('Failed to record bet in database:', error);
+      console.error('❌ Failed to record bet in database:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       // Don't show error to user - bet is already on blockchain
     }
   };

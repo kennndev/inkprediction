@@ -155,7 +155,7 @@ const Home = () => {
               </motion.h1>
               {userStats?.streak > 0 && <StreakBadge streak={userStats.streak} />}
             </div>
-         <p className="text-lg sm:text-xl text-gray-300 mb-4">
+            <p className="text-lg sm:text-xl text-gray-300 mb-4">
               Bet on everything
             </p>
 
@@ -305,7 +305,7 @@ const Home = () => {
             </p>
             <Link to="/create">
               <button className="btn-gold font-bold">
-                Create Market →
+                Propose a Market →
               </button>
             </Link>
           </div>

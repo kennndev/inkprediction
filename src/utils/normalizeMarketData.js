@@ -4,6 +4,18 @@
  * Converts string numbers to actual numbers
  * Handles BigNumber objects from ethers.js
  */
+const toTimestamp = (val) => {
+    if (!val) return 0;
+    if (typeof val === 'number') return val;
+    // Handle numeric strings (Unix timestamps sent as strings from backend)
+    if (typeof val === 'string' && /^\d+$/.test(val)) {
+        return parseInt(val, 10);
+    }
+    // Handle ISO date strings
+    const date = new Date(val);
+    return isNaN(date.getTime()) ? 0 : Math.floor(date.getTime() / 1000);
+};
+
 export const normalizeMarketData = (market) => {
     return {
         ...market,
@@ -16,15 +28,14 @@ export const normalizeMarketData = (market) => {
         inkContractAddress: market.ink_contract_address || market.inkContractAddress,
         inkMetricEndpoint: market.ink_metric_endpoint || market.inkMetricEndpoint,
         marketId: market.market_id || market.marketId,
-        createdAt: market.created_at || market.createdAt,
+        createdAt: toTimestamp(market.created_at || market.createdAt),
+        deadline: toTimestamp(market.deadline),
         createdBy: market.created_by || market.createdBy,
         finalMetric: market.final_metric || market.finalMetric,
 
         // Parse pool values
         yesPool: parseFloat(market.yesPool || market.yes_pool || 0),
         noPool: parseFloat(market.noPool || market.no_pool || 0),
-
-        // Handle BigNumber objects for odds (from ethers.js)
         yesOdds: market.yesOdds?.hex
             ? parseInt(market.yesOdds.hex, 16)
             : parseFloat(market.yesOdds || market.yes_odds || 5000),

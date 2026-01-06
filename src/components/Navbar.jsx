@@ -3,6 +3,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
+import axios from 'axios';
 
 const ADMIN_WALLET = import.meta.env.VITE_ADMIN_WALLET || '';
 
@@ -10,7 +11,7 @@ const Navbar = () => {
   const location = useLocation();
   const { address, isConnected } = useAccount();
   const [scrolled, setScrolled] = useState(false);
-  const [hasUnclaimedReward, setHasUnclaimedReward] = useState(true);
+  const [hasUnclaimedReward, setHasUnclaimedReward] = useState(false);
 
   const isAdmin = isConnected && address?.toLowerCase() === ADMIN_WALLET.toLowerCase();
 
@@ -21,6 +22,32 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Check if daily reward is available
+  useEffect(() => {
+    const checkDailyReward = async () => {
+      if (!isConnected || !address) {
+        setHasUnclaimedReward(false);
+        return;
+      }
+
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const response = await axios.get(`${API_URL}/api/user/${address}/daily-reward`);
+
+        // Show badge only if reward is available (not claimed today)
+        setHasUnclaimedReward(response.data.canClaim === true);
+      } catch (error) {
+        console.error('Error checking daily reward:', error);
+        setHasUnclaimedReward(false);
+      }
+    };
+
+    checkDailyReward();
+    // Check every minute
+    const interval = setInterval(checkDailyReward, 60000);
+    return () => clearInterval(interval);
+  }, [address, isConnected]);
 
   const navItems = [
     { path: '/', label: 'Markets', icon: '🎯' },
@@ -39,9 +66,8 @@ const Navbar = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled ? 'glass-strong shadow-2xl' : 'bg-transparent'
-      }`}
+      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'glass-strong shadow-2xl' : 'bg-transparent'
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
@@ -71,11 +97,10 @@ const Navbar = () => {
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`relative px-4 py-2 rounded-full font-medium transition-all duration-300 ${
-                      isActive
+                    className={`relative px-4 py-2 rounded-full font-medium transition-all duration-300 ${isActive
                         ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-lg glow-purple'
                         : 'glass hover:glass-strong'
-                    }`}
+                      }`}
                   >
                     <span className="mr-1">{item.icon}</span>
                     <span className="text-sm">{item.label}</span>
@@ -170,11 +195,10 @@ const MobileMenu = ({ navItems }) => {
                     <Link key={item.path} to={item.path} onClick={() => setIsOpen(false)}>
                       <motion.div
                         whileTap={{ scale: 0.95 }}
-                        className={`relative p-4 rounded-2xl font-medium transition-all ${
-                          isActive
+                        className={`relative p-4 rounded-2xl font-medium transition-all ${isActive
                             ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white'
                             : 'glass hover:glass-strong'
-                        }`}
+                          }`}
                       >
                         <span className="mr-3 text-2xl">{item.icon}</span>
                         {item.label}

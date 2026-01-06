@@ -1,40 +1,48 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const LiveActivityFeed = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activities, setActivities] = useState([]);
   const [newActivityCount, setNewActivityCount] = useState(0);
+  const [lastActivityId, setLastActivityId] = useState(null);
+
+  const fetchRecentActivity = async () => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const response = await axios.get(`${API_URL}/api/activity/recent`);
+
+      if (response.data.success && response.data.activities) {
+        const newActivities = response.data.activities;
+
+        // Check for new activities
+        if (lastActivityId && newActivities.length > 0) {
+          const newCount = newActivities.findIndex(a => a.id === lastActivityId);
+          if (newCount > 0 && !isExpanded) {
+            setNewActivityCount(prev => prev + newCount);
+          }
+        }
+
+        if (newActivities.length > 0) {
+          setLastActivityId(newActivities[0].id);
+        }
+
+        setActivities(newActivities);
+      }
+    } catch (error) {
+      console.error('Error fetching activity feed:', error);
+      // Keep existing activities on error
+    }
+  };
 
   useEffect(() => {
-    // Simulated live feed - in production, use WebSocket
-    const mockActivities = [
-      { id: 1, type: 'bet', user: '0x1a2b...3c4d', position: true, amount: '50', marketId: '1', timestamp: Date.now() - 30000 },
-      { id: 2, type: 'bet', user: '0x5e6f...7g8h', position: false, amount: '100', marketId: '2', timestamp: Date.now() - 60000 },
-      { id: 3, type: 'win', user: '0x9i0j...1k2l', amount: '250', marketId: '3', timestamp: Date.now() - 90000 },
-      { id: 4, type: 'bet', user: '0x3m4n...5o6p', position: true, amount: '25', marketId: '1', timestamp: Date.now() - 120000 },
-      { id: 5, type: 'streak', user: '0x7q8r...9s0t', streak: 5, timestamp: Date.now() - 150000 },
-    ];
-    setActivities(mockActivities);
+    // Fetch initial data
+    fetchRecentActivity();
 
-    // Simulate new activities
-    const interval = setInterval(() => {
-      const newActivity = {
-        id: Date.now(),
-        type: Math.random() > 0.3 ? 'bet' : 'win',
-        user: `0x${Math.random().toString(16).substr(2, 4)}...${Math.random().toString(16).substr(2, 4)}`,
-        position: Math.random() > 0.5,
-        amount: (Math.floor(Math.random() * 100) + 10).toString(),
-        marketId: Math.floor(Math.random() * 5 + 1).toString(),
-        timestamp: Date.now(),
-      };
-
-      setActivities(prev => [newActivity, ...prev.slice(0, 9)]);
-      if (!isExpanded) {
-        setNewActivityCount(prev => prev + 1);
-      }
-    }, 15000);
+    // Poll for new activities every 30 seconds
+    const interval = setInterval(fetchRecentActivity, 30000);
 
     return () => clearInterval(interval);
   }, [isExpanded]);

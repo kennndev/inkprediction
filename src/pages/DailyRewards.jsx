@@ -146,10 +146,10 @@ const DailyRewards = () => {
           animate={{ y: 0, opacity: 1 }}
           className="text-center mb-8"
         >
-          <h1 className="text-display font-display font-bold text-gradient-cyber mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-gradient-cyber mb-4">
             Daily Rewards 🎁
           </h1>
-          <p className="text-xl text-gray-300">
+          <p className="text-base sm:text-lg md:text-xl text-gray-300">
             Come back every day to claim XP and special bonuses!
           </p>
         </motion.div>
@@ -172,15 +172,15 @@ const DailyRewards = () => {
                 <motion.div
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ repeat: Infinity, duration: 0.5 }}
-                  className="text-9xl mb-6"
+                  className="text-6xl sm:text-8xl md:text-9xl mb-6"
                 >
                   🎉
                 </motion.div>
-                <h2 className="text-4xl font-bold text-gradient-gold mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gradient-gold mb-4">
                   +{claimedReward.xp} XP!
                 </h2>
                 {claimedReward.bonus && (
-                  <p className="text-2xl text-purple-300">
+                  <p className="text-xl sm:text-2xl text-purple-300">
                     Bonus: {claimedReward.bonus}
                   </p>
                 )}
@@ -203,8 +203,8 @@ const DailyRewards = () => {
               className="daily-reward-card mb-8"
             >
               <div className="daily-reward-content text-center">
-                <div className="text-6xl mb-4">🔥</div>
-                <div className="text-5xl font-bold text-gradient-fire mb-2">
+                <div className="text-4xl sm:text-6xl mb-4">🔥</div>
+                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-gradient-fire mb-2">
                   {rewardData?.currentStreak || 0} Day Streak
                 </div>
                 <p className="text-gray-300">
@@ -245,11 +245,10 @@ const DailyRewards = () => {
               <button
                 onClick={claimReward}
                 disabled={!rewardData?.canClaim || claiming}
-                className={`px-12 py-4 rounded-2xl text-xl font-bold transition-all ${
-                  rewardData?.canClaim
-                    ? 'btn-gold animate-glow'
-                    : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                }`}
+                className={`px-6 sm:px-12 py-3 sm:py-4 rounded-2xl text-base sm:text-xl font-bold transition-all ${rewardData?.canClaim
+                  ? 'btn-gold animate-glow'
+                  : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  }`}
               >
                 {claiming ? (
                   <span className="flex items-center gap-2">
@@ -278,7 +277,7 @@ const DailyRewards = () => {
               className="card mb-8"
             >
               <h3 className="text-xl font-bold mb-6 text-center">Weekly Rewards</h3>
-              <div className="grid grid-cols-7 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 sm:gap-3">
                 {DAILY_REWARDS.map((reward) => {
                   const isClaimed = reward.day < currentDayInWeek ||
                     (reward.day === currentDayInWeek && !rewardData?.canClaim);
@@ -289,24 +288,23 @@ const DailyRewards = () => {
                     <motion.div
                       key={reward.day}
                       whileHover={{ scale: 1.05 }}
-                      className={`relative p-4 rounded-xl text-center ${
-                        isToday
-                          ? 'bg-gradient-to-br from-yellow-500/30 to-orange-500/30 border-2 border-yellow-500/50 animate-glow'
-                          : isClaimed
-                            ? 'bg-green-500/20 border-2 border-green-500/30'
-                            : 'purple-box'
-                      }`}
+                      className={`relative p-2 sm:p-4 rounded-xl text-center ${isToday
+                        ? 'bg-gradient-to-br from-yellow-500/30 to-orange-500/30 border-2 border-yellow-500/50 animate-glow'
+                        : isClaimed
+                          ? 'bg-green-500/20 border-2 border-green-500/30'
+                          : 'purple-box'
+                        }`}
                     >
                       {isClaimed && (
-                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-xs">
+                        <div className="absolute -top-2 -right-2 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full flex items-center justify-center text-xs">
                           ✓
                         </div>
                       )}
                       <div className="text-xs text-gray-400 mb-1">Day {reward.day}</div>
-                      <div className={`text-2xl mb-1 ${isFuture ? 'opacity-50' : ''}`}>
+                      <div className={`text-xl sm:text-2xl mb-1 ${isFuture ? 'opacity-50' : ''}`}>
                         {reward.day === 7 ? '🎁' : '⭐'}
                       </div>
-                      <div className={`font-bold ${isToday ? 'text-yellow-400' : isClaimed ? 'text-green-400' : 'text-gray-300'}`}>
+                      <div className={`text-sm sm:text-base font-bold ${isToday ? 'text-yellow-400' : isClaimed ? 'text-green-400' : 'text-gray-300'}`}>
                         +{reward.xp} XP
                       </div>
                       {reward.bonus && (
@@ -342,11 +340,10 @@ const DailyRewards = () => {
                       initial={{ x: -20, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ delay: 0.5 + index * 0.1 }}
-                      className={`p-4 rounded-xl ${
-                        isAchieved
-                          ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30'
-                          : 'purple-box'
-                      }`}
+                      className={`p-4 rounded-xl ${isAchieved
+                        ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30'
+                        : 'purple-box'
+                        }`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-3">

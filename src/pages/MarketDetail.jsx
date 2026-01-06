@@ -15,56 +15,56 @@ import MarketHistory from '../components/MarketHistory';
 
 const USDC_ABI = [
   {
-    "constant": false,
-    "inputs": [
-      { "name": "spender", "type": "address" },
-      { "name": "amount", "type": "uint256" }
+    constant: false,
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' }
     ],
-    "name": "approve",
-    "outputs": [{ "name": "", "type": "bool" }],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: 'approve',
+    outputs: [{ name: '', type: 'bool' }],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function'
   },
   {
-    "constant": true,
-    "inputs": [
-      { "name": "owner", "type": "address" },
-      { "name": "spender", "type": "address" }
+    constant: true,
+    inputs: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' }
     ],
-    "name": "allowance",
-    "outputs": [{ "name": "", "type": "uint256" }],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
+    name: 'allowance',
+    outputs: [{ name: '', type: 'uint256' }],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
   }
 ];
 
 const CONTRACT_ABI = [
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "_marketId", "type": "uint256" },
-      { "internalType": "bool", "name": "_isYes", "type": "bool" },
-      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+    inputs: [
+      { internalType: 'uint256', name: '_marketId', type: 'uint256' },
+      { internalType: 'bool', name: '_isYes', type: 'bool' },
+      { internalType: 'uint256', name: '_amount', type: 'uint256' }
     ],
-    "name": "bet",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: 'bet',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "marketId", "type": "uint256" }],
-    "name": "claim",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    inputs: [{ internalType: 'uint256', name: 'marketId', type: 'uint256' }],
+    name: 'claim',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "marketId", "type": "uint256" }],
-    "name": "claimRefund",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    inputs: [{ internalType: 'uint256', name: 'marketId', type: 'uint256' }],
+    name: 'claimRefund',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
   }
 ];
 
@@ -74,27 +74,33 @@ const USDC_ADDRESS = import.meta.env.VITE_USDC_ADDRESS;
 const MarketDetail = () => {
   const { id } = useParams();
   const { address, isConnected } = useAccount();
+
   const [market, setMarket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [betAmount, setBetAmount] = useState('10');
   const [needsApproval, setNeedsApproval] = useState(true);
   const [lastBetPosition, setLastBetPosition] = useState(null);
-  const [activeTab, setActiveTab] = useState('bet');
+  const [activeTab, setActiveTab] = useState('history');
   const [recentBets, setRecentBets] = useState([]);
+
+  // NEW: remember which bet user wanted so approval can happen under the hood
+  const [pendingBet, setPendingBet] = useState(null);
+  // shape: { isYes: boolean, amount: string }
 
   useEffect(() => {
     fetchMarket();
     fetchRecentBets();
     const interval = setInterval(fetchMarket, 15000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchMarket = async () => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await axios.get(`${API_URL}/api/market/${id}`);
-      const market = normalizeMarketData(response.data.market);
-      setMarket(market);
+      const normalized = normalizeMarketData(response.data.market);
+      setMarket(normalized);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching market:', error);
@@ -134,7 +140,7 @@ const MarketDetail = () => {
     abi: USDC_ABI,
     functionName: 'allowance',
     args: [address, CONTRACT_ADDRESS],
-    watch: true,
+    watch: true
   });
 
   useEffect(() => {
@@ -149,32 +155,16 @@ const MarketDetail = () => {
         const allowanceBN = ethers.BigNumber.from(allowance.toString());
         setNeedsApproval(allowanceBN.lt(amountWei));
       } catch (e) {
-        console.error("Error checking allowance:", e);
+        console.error('Error checking allowance:', e);
       }
     }
   }, [allowance, betAmount, isConnected]);
-
-  // Approve USDC
-  const { write: approveUSDC, data: approveData } = useContractWrite({
-    address: USDC_ADDRESS,
-    abi: USDC_ABI,
-    functionName: 'approve',
-    args: [CONTRACT_ADDRESS, ethers.constants.MaxUint256],
-  });
-
-  const { isLoading: isApproving } = useWaitForTransaction({
-    hash: approveData?.hash,
-    onSuccess: () => {
-      toast.success('🔓 USDC Approved! You can now place your bet.');
-      setNeedsApproval(false);
-    },
-  });
 
   // Place Bet
   const { write: placeBet, data: betData } = useContractWrite({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
-    functionName: 'bet',
+    functionName: 'bet'
   });
 
   const { isLoading: isBetting } = useWaitForTransaction({
@@ -189,26 +179,59 @@ const MarketDetail = () => {
 
       fetchMarket();
       fetchRecentBets();
-    },
+    }
+  });
+
+  // Approve USDC
+  const { write: approveUSDC, data: approveData } = useContractWrite({
+    address: USDC_ADDRESS,
+    abi: USDC_ABI,
+    functionName: 'approve',
+    args: [CONTRACT_ADDRESS, ethers.constants.MaxUint256]
+  });
+
+  const { isLoading: isApproving } = useWaitForTransaction({
+    hash: approveData?.hash,
+    onSuccess: () => {
+      toast.success('🔓 USDC Approved! Placing your bet...');
+      setNeedsApproval(false);
+
+      // AUTO-BET after approval confirms
+      if (pendingBet?.amount && pendingBet?.isYes !== undefined) {
+        try {
+          const amountWei = ethers.utils.parseUnits(pendingBet.amount, 6);
+          setLastBetPosition(pendingBet.isYes);
+          placeBet({ args: [id, pendingBet.isYes, amountWei] });
+        } catch (e) {
+          console.error('Auto-bet after approve failed:', e);
+          toast.error('Approved, but failed to place bet');
+        } finally {
+          setPendingBet(null);
+        }
+      }
+    }
   });
 
   const handleAction = (isYes) => {
     if (!isConnected) return toast.error('Connect Wallet First');
     if (!betAmount || parseFloat(betAmount) < 1) return toast.error('Min bet is 1 USDC');
 
+    // store intent so approve can happen under the hood
+    setPendingBet({ isYes, amount: betAmount });
     setLastBetPosition(isYes);
 
     if (needsApproval) {
-      toast('Approving USDC first...', { icon: '🔓' });
-      approveUSDC();
-    } else {
-      try {
-        const amountWei = ethers.utils.parseUnits(betAmount, 6);
-        placeBet({ args: [id, isYes, amountWei] });
-      } catch (e) {
-        console.error("Bet error:", e);
-        toast.error("Failed to prepare bet");
-      }
+      toast('Unlocking USDC (one-time)...', { icon: '🔓' });
+      approveUSDC?.();
+      return;
+    }
+
+    try {
+      const amountWei = ethers.utils.parseUnits(betAmount, 6);
+      placeBet({ args: [id, isYes, amountWei] });
+    } catch (e) {
+      console.error('Bet error:', e);
+      toast.error('Failed to prepare bet');
     }
   };
 
@@ -230,12 +253,17 @@ const MarketDetail = () => {
   const timeLeft = getTimeLeft(market.deadline);
   const isExpired = market.deadline * 1000 < Date.now();
 
-  const isInkChain = market.category === 'INK CHAIN' || (market.tweetId && market.tweetId.toString().startsWith('ink_'));
+  const isInkChain =
+    market.category === 'INK CHAIN' || (market.tweetId && market.tweetId.toString().startsWith('ink_'));
+
   const marketInfo = {
     emoji: market.emoji || (isInkChain ? '⛓️' : '🐦'),
     category: market.category || (isInkChain ? 'INK CHAIN' : 'TWITTER'),
     question: market.question || generateFallbackQuestion(market)
   };
+
+  const isDisabled = isExpired || market.resolved;
+  const busy = isBetting || isApproving || !!pendingBet;
 
   return (
     <div className="min-h-screen py-8 px-4 text-white">
@@ -243,19 +271,14 @@ const MarketDetail = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <Link to="/">
-            <button className="arcade-btn purple-box px-4 py-2">
-              ◀ BACK TO MARKETS
-            </button>
+            <button className="arcade-btn purple-box px-4 py-2">◀ BACK TO MARKETS</button>
           </Link>
 
-          <ShareButtons
-            market={market}
-            question={marketInfo.question}
-          />
+          <ShareButtons market={market} question={marketInfo.question} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* LEFT: Market Info (2 cols) */}
+          {/* LEFT */}
           <div className="lg:col-span-2 space-y-6">
             {/* Main Card */}
             <motion.div
@@ -263,15 +286,24 @@ const MarketDetail = () => {
               animate={{ opacity: 1, y: 0 }}
               className="arcade-card pixel-border-purple p-1"
             >
-              <div className="p-6 min-h-[300px] relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(77, 57, 93, 0.4) 0%, rgba(45, 27, 61, 0.6) 100%)' }}>
+              <div
+                className="p-6 min-h-[300px] relative overflow-hidden"
+                style={{
+                  background:
+                    'linear-gradient(135deg, rgba(77, 57, 93, 0.4) 0%, rgba(45, 27, 61, 0.6) 100%)'
+                }}
+              >
                 {/* Category Badge */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
                     <span className="text-5xl">{marketInfo.emoji}</span>
-                    <span className={`px-4 py-2 rounded-full font-mono text-sm ${marketInfo.category === 'INK CHAIN'
-                        ? 'bg-purple-900/50 text-purple-300 border border-purple-500/30'
-                        : 'bg-blue-900/50 text-blue-300 border border-blue-500/30'
-                      }`}>
+                    <span
+                      className={`px-4 py-2 rounded-full font-mono text-sm ${
+                        marketInfo.category === 'INK CHAIN'
+                          ? 'bg-purple-900/50 text-purple-300 border border-purple-500/30'
+                          : 'bg-blue-900/50 text-blue-300 border border-blue-500/30'
+                      }`}
+                    >
                       {marketInfo.category}
                     </span>
                   </div>
@@ -293,8 +325,12 @@ const MarketDetail = () => {
                 {/* Progress */}
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between font-arcade text-sm">
-                    <span className="text-gray-400">Current: <span className="text-white">{(market.currentMetric / 1000).toFixed(1)}K</span></span>
-                    <span className="text-gray-400">Target: <span className="text-gradient-pink">{(market.targetMetric / 1000).toFixed(1)}K</span></span>
+                    <span className="text-gray-400">
+                      Current: <span className="text-white">{(market.currentMetric / 1000).toFixed(1)}K</span>
+                    </span>
+                    <span className="text-gray-400">
+                      Target: <span className="text-gradient-pink">{(market.targetMetric / 1000).toFixed(1)}K</span>
+                    </span>
                   </div>
 
                   <div className="health-bar-container">
@@ -323,11 +359,17 @@ const MarketDetail = () => {
                   </div>
                   <div className="purple-box p-3 sm:p-4 rounded-xl text-center">
                     <div className="text-gray-400 text-[10px] sm:text-xs mb-1">VOLUME</div>
-                    <div className="text-base sm:text-xl font-bold text-gradient-gold">{totalPool.toFixed(1)} USDC</div>
+                    <div className="text-base sm:text-xl font-bold text-gradient-gold">
+                      {totalPool.toFixed(1)} USDC
+                    </div>
                   </div>
                   <div className="purple-box p-3 sm:p-4 rounded-xl text-center">
                     <div className="text-gray-400 text-[10px] sm:text-xs mb-1">TIME</div>
-                    <div className={`text-base sm:text-xl font-bold ${isExpired ? 'text-red-400' : 'text-gradient-purple'}`}>
+                    <div
+                      className={`text-base sm:text-xl font-bold ${
+                        isExpired ? 'text-red-400' : 'text-gradient-purple'
+                      }`}
+                    >
                       {timeLeft}
                     </div>
                   </div>
@@ -412,7 +454,7 @@ const MarketDetail = () => {
                     type="number"
                     value={betAmount}
                     onChange={(e) => setBetAmount(e.target.value)}
-                    disabled={isExpired || market.resolved}
+                    disabled={isDisabled}
                     className="w-full input-purple text-neon-green font-arcade text-2xl p-4 text-center rounded-xl"
                   />
                   <div className="absolute right-4 top-5 text-gray-500 font-arcade text-xs">USDC</div>
@@ -423,7 +465,7 @@ const MarketDetail = () => {
                     <button
                       key={amt}
                       onClick={() => setBetAmount(amt)}
-                      disabled={isExpired || market.resolved}
+                      disabled={isDisabled}
                       className="purple-box text-white font-arcade text-xs px-3 py-2 rounded-lg hover:bg-purple-500/30 transition-colors disabled:opacity-50"
                     >
                       {amt}
@@ -433,50 +475,50 @@ const MarketDetail = () => {
               </div>
 
               {/* Price Impact Preview */}
-              {betAmount && parseFloat(betAmount) > 0 && !isExpired && !market.resolved && (
-                <PriceImpactPreview
-                  market={market}
-                  betAmount={betAmount}
-                />
+              {betAmount && parseFloat(betAmount) > 0 && !isDisabled && (
+                <PriceImpactPreview market={market} betAmount={betAmount} />
+              )}
+
+              {/* small status line */}
+              {pendingBet && (
+                <div className="text-center text-xs text-gray-400 mb-3 font-arcade">
+                  Preparing {pendingBet.isYes ? 'YES' : 'NO'}...
+                </div>
               )}
 
               {/* Action Buttons */}
-              {!isExpired && !market.resolved ? (
+              {!isDisabled ? (
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <button
                     onClick={() => handleAction(true)}
-                    disabled={isBetting || isApproving}
-                    className={`rounded-2xl border-b-8 active:border-b-0 active:translate-y-2 transition-all p-4 flex flex-col items-center justify-center gap-2
-                      ${needsApproval ? 'bg-amber-500 border-amber-700' : 'bg-green-500 border-green-700'}
-                      hover:brightness-110 shadow-lg disabled:opacity-50
-                    `}
+                    disabled={busy}
+                    className="rounded-2xl border-b-8 active:border-b-0 active:translate-y-2 transition-all p-4 flex flex-col items-center justify-center gap-2
+                      bg-green-500 border-green-700 hover:brightness-110 shadow-lg disabled:opacity-50"
                   >
-                    <div className="text-3xl">{needsApproval ? '🔓' : '🚀'}</div>
-                    <span className="font-arcade text-white text-sm">
-                      {needsApproval ? 'APPROVE' : 'BET YES'}
-                    </span>
+                    <div className="text-3xl">🚀</div>
+                    <span className="font-arcade text-white text-sm">BET YES</span>
+                    {needsApproval && (
+                      <span className="font-arcade text-[10px] text-white/80">will unlock USDC first</span>
+                    )}
                   </button>
 
                   <button
                     onClick={() => handleAction(false)}
-                    disabled={isBetting || isApproving}
-                    className={`rounded-2xl border-b-8 active:border-b-0 active:translate-y-2 transition-all p-4 flex flex-col items-center justify-center gap-2
-                      ${needsApproval ? 'bg-amber-500 border-amber-700' : 'bg-red-500 border-red-700'}
-                      hover:brightness-110 shadow-lg disabled:opacity-50
-                    `}
+                    disabled={busy}
+                    className="rounded-2xl border-b-8 active:border-b-0 active:translate-y-2 transition-all p-4 flex flex-col items-center justify-center gap-2
+                      bg-red-500 border-red-700 hover:brightness-110 shadow-lg disabled:opacity-50"
                   >
-                    <div className="text-3xl">{needsApproval ? '🔓' : '📉'}</div>
-                    <span className="font-arcade text-white text-sm">
-                      {needsApproval ? 'APPROVE' : 'BET NO'}
-                    </span>
+                    <div className="text-3xl">📉</div>
+                    <span className="font-arcade text-white text-sm">BET NO</span>
+                    {needsApproval && (
+                      <span className="font-arcade text-[10px] text-white/80">will unlock USDC first</span>
+                    )}
                   </button>
                 </div>
               ) : (
                 <div className="text-center p-6 purple-box rounded-xl mb-6">
                   <div className="text-4xl mb-2">{market.resolved ? '🏆' : '⏰'}</div>
-                  <div className="text-gray-400">
-                    {market.resolved ? 'Market has been resolved' : 'Market has expired'}
-                  </div>
+                  <div className="text-gray-400">{market.resolved ? 'Market has been resolved' : 'Market has expired'}</div>
                 </div>
               )}
 
@@ -485,7 +527,7 @@ const MarketDetail = () => {
                 <div className="text-center p-4 purple-box rounded-xl animate-pulse">
                   <div className="spinner mx-auto mb-2" />
                   <div className="text-sm text-gray-400">
-                    {isApproving ? 'Approving USDC...' : 'Placing bet...'}
+                    {isApproving ? 'Unlocking USDC...' : 'Placing bet...'}
                   </div>
                 </div>
               )}

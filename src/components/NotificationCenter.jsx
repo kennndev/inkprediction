@@ -7,13 +7,9 @@ const NotificationCenter = () => {
 
   // In production, this would connect to a WebSocket or polling service
   useEffect(() => {
-    // Simulated notifications
-    const mockNotifications = [
-      { id: 1, type: 'win', message: 'You won 150 USDC on Market #5!', read: false, timestamp: Date.now() - 300000 },
-      { id: 2, type: 'achievement', message: 'Achievement unlocked: First Win! 🎉', read: false, timestamp: Date.now() - 600000 },
-      { id: 3, type: 'streak', message: 'You\'re on a 3 win streak! 🔥', read: true, timestamp: Date.now() - 900000 },
-    ];
-    setNotifications(mockNotifications);
+    // TODO: Connect to real notification service
+    // For now, start with empty notifications - no fake data!
+    setNotifications([]);
   }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -102,9 +98,8 @@ const NotificationCenter = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       onClick={() => markAsRead(notification.id)}
-                      className={`p-4 border-b border-purple-500/10 cursor-pointer hover:bg-purple-500/10 transition-colors ${
-                        !notification.read ? 'bg-purple-500/5' : ''
-                      }`}
+                      className={`p-4 border-b border-purple-500/10 cursor-pointer hover:bg-purple-500/10 transition-colors ${!notification.read ? 'bg-purple-500/5' : ''
+                        }`}
                     >
                       <div className="flex items-start gap-3">
                         <span className="text-2xl">{getIcon(notification.type)}</span>

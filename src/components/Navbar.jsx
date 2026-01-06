@@ -57,9 +57,7 @@ const Navbar = () => {
     { path: '/daily-rewards', label: 'Daily', icon: '🎁', hasNotification: hasUnclaimedReward },
   ];
 
-  if (isAdmin) {
-    navItems.push({ path: '/admin', label: 'Admin', icon: '🎛️' });
-  }
+
 
   return (
     <motion.nav
@@ -98,8 +96,8 @@ const Navbar = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className={`relative px-4 py-2 rounded-full font-medium transition-all duration-300 ${isActive
-                        ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-lg glow-purple'
-                        : 'glass hover:glass-strong'
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-lg glow-purple'
+                      : 'glass hover:glass-strong'
                       }`}
                   >
                     <span className="mr-1">{item.icon}</span>
@@ -112,17 +110,30 @@ const Navbar = () => {
               );
             })}
 
-            {/* Create Market Button */}
-            <Link to="/create">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 rounded-full font-medium bg-gradient-to-r from-yellow-500 to-orange-500 text-black"
-              >
-                <span className="mr-1">➕</span>
-                <span className="text-sm">Create</span>
-              </motion.div>
-            </Link>
+            {/* Action Button: Admin Panel or Propose Market */}
+            {isAdmin ? (
+              <Link to="/admin">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 py-2 rounded-full font-medium bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-900/20"
+                >
+                  <span className="mr-1">🎛️</span>
+                  <span className="text-sm">Admin Panel</span>
+                </motion.div>
+              </Link>
+            ) : (
+              <Link to="/create">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 py-2 rounded-full font-medium bg-gradient-to-r from-yellow-500 to-orange-500 text-black"
+                >
+                  <span className="mr-1">💡</span>
+                  <span className="text-sm">Propose Market</span>
+                </motion.div>
+              </Link>
+            )}
           </div>
 
           {/* Right Section */}
@@ -141,7 +152,7 @@ const Navbar = () => {
 
             {/* Mobile Menu Button */}
             <div className="lg:hidden">
-              <MobileMenu navItems={navItems} />
+              <MobileMenu navItems={navItems} isAdmin={isAdmin} />
             </div>
           </div>
         </div>
@@ -150,7 +161,7 @@ const Navbar = () => {
   );
 };
 
-const MobileMenu = ({ navItems }) => {
+const MobileMenu = ({ navItems, isAdmin }) => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
@@ -196,8 +207,8 @@ const MobileMenu = ({ navItems }) => {
                       <motion.div
                         whileTap={{ scale: 0.95 }}
                         className={`relative p-4 rounded-2xl font-medium transition-all ${isActive
-                            ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white'
-                            : 'glass hover:glass-strong'
+                          ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white'
+                          : 'glass hover:glass-strong'
                           }`}
                       >
                         <span className="mr-3 text-2xl">{item.icon}</span>
@@ -210,15 +221,27 @@ const MobileMenu = ({ navItems }) => {
                   );
                 })}
 
-                <Link to="/create" onClick={() => setIsOpen(false)}>
-                  <motion.div
-                    whileTap={{ scale: 0.95 }}
-                    className="p-4 rounded-2xl font-medium bg-gradient-to-r from-yellow-500 to-orange-500 text-black"
-                  >
-                    <span className="mr-3 text-2xl">➕</span>
-                    Create Market
-                  </motion.div>
-                </Link>
+                {isAdmin ? (
+                  <Link to="/admin" onClick={() => setIsOpen(false)}>
+                    <motion.div
+                      whileTap={{ scale: 0.95 }}
+                      className="p-4 rounded-2xl font-medium bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                    >
+                      <span className="mr-3 text-2xl">🎛️</span>
+                      Admin Panel
+                    </motion.div>
+                  </Link>
+                ) : (
+                  <Link to="/create" onClick={() => setIsOpen(false)}>
+                    <motion.div
+                      whileTap={{ scale: 0.95 }}
+                      className="p-4 rounded-2xl font-medium bg-gradient-to-r from-yellow-500 to-orange-500 text-black"
+                    >
+                      <span className="mr-3 text-2xl">💡</span>
+                      Propose Market
+                    </motion.div>
+                  </Link>
+                )}
 
                 <div className="pt-4 border-t border-white/10">
                   <ConnectButton />

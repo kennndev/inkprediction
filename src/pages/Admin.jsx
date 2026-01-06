@@ -1,490 +1,423 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAccount } from 'wagmi';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import ManualResolveButton from '../components/ManualResolveButton';
 
 const ADMIN_WALLET = import.meta.env.VITE_ADMIN_WALLET || '';
 
 const Admin = () => {
     const { address, isConnected } = useAccount();
-
-    // Check if connected wallet is admin
-    const isAdmin = isConnected && address?.toLowerCase() === ADMIN_WALLET.toLowerCase();
-
-    if (!isConnected) {
-        return <ConnectWalletPrompt />;
-    }
-
-    if (!isAdmin) {
-        return <UnauthorizedAccess />;
-    }
-
-    return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="min-h-screen py-4 sm:py-8 px-3 sm:px-4 lg:px-8"
-        >
-            <div className="max-w-4xl mx-auto">
-                {/* Header */}
-                <motion.div
-                    initial={{ y: -20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    className="mb-6 sm:mb-8 text-center sm:text-left"
-                >
-                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-gradient-cyber mb-2 sm:mb-4">
-                        Admin Dashboard 🎛️
-                    </h1>
-                    <p className="text-base sm:text-lg lg:text-xl text-gray-300">
-                        Create and manage prediction markets
-                    </p>
-                </motion.div>
-
-                {/* Create Prediction Form */}
-                <CreatePredictionForm />
-
-                {/* Manage Markets */}
-                <ManageMarkets />
-            </div>
-        </motion.div>
-    );
-};
-
-const CreatePredictionForm = () => {
-    const [formData, setFormData] = useState({
-        category: 'TWITTER',
-        question: '',
-        emoji: '🎯',
-        tweetUrl: '',
-        inkContractAddress: '',
-        targetMetric: '',
-        metricType: 'like',
-        durationHours: 24,
-    });
-    const [creating, setCreating] = useState(false);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setCreating(true);
-
-        try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-
-            // Use the /api/admin/predictions endpoint (handles both categories)
-            const payload = {
-                category: formData.category,
-                question: formData.question,
-                emoji: formData.emoji,
-                tweetUrl: formData.tweetUrl,
-                inkContractAddress: formData.inkContractAddress,
-                targetMetric: parseInt(formData.targetMetric),
-                metricType: formData.metricType,
-                durationHours: parseInt(formData.durationHours)
-            };
-
-            const response = await axios.post(`${API_URL}/api/admin/predictions`, payload);
-
-            if (response.data.success) {
-                toast.success(`✅ Prediction created! Market ID: ${response.data.marketId}`);
-
-                // Reset form
-                setFormData({
-                    ...formData,
-                    question: '',
-                    tweetUrl: '',
-                    inkContractAddress: '',
-                    targetMetric: '',
-                });
-            }
-        } catch (error) {
-            console.error('Error creating prediction:', error);
-            toast.error(error.response?.data?.error || 'Failed to create prediction');
-        } finally {
-            setCreating(false);
-        }
-    };
-
-    return (
-        <motion.div
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            className="card p-4 sm:p-6 lg:p-8"
-        >
-            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 flex items-center space-x-2">
-                <span>➕</span>
-                <span>Create New Prediction</span>
-            </h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-                {/* Category Selection */}
-                <div>
-                    <label className="block text-sm font-medium mb-2">Category</label>
-                    <div className="grid grid-cols-2 gap-3">
-                        <button
-                            type="button"
-                            onClick={() => setFormData({ ...formData, category: 'TWITTER' })}
-                            className={`p-3 sm:p-4 rounded-lg border-2 transition-all touch-manipulation ${formData.category === 'TWITTER'
-                                ? 'border-neon-purple bg-neon-purple/10'
-                                : 'border-gray-600 hover:border-gray-500 active:border-gray-400'
-                                }`}
-                        >
-                            <div className="text-2xl sm:text-3xl mb-1">🐦</div>
-                            <div className="font-bold text-xs sm:text-sm">Twitter</div>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setFormData({ ...formData, category: 'INK CHAIN' })}
-                            className={`p-3 sm:p-4 rounded-lg border-2 transition-all touch-manipulation ${formData.category === 'INK CHAIN'
-                                ? 'border-neon-purple bg-neon-purple/10'
-                                : 'border-gray-600 hover:border-gray-500 active:border-gray-400'
-                                }`}
-                        >
-                            <div className="text-2xl sm:text-3xl mb-1">⛓️</div>
-                            <div className="font-bold text-xs sm:text-sm">Ink Chain</div>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Question */}
-                <div>
-                    <label className="block text-sm font-medium mb-2">Question</label>
-                    <textarea
-                        value={formData.question}
-                        onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-                        placeholder="Will Vitalik's tweet reach 10K likes?"
-                        className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base resize-none"
-                        rows="2"
-                        required
-                    />
-                </div>
-
-                {/* Emoji */}
-                <div>
-                    <label className="block text-sm font-medium mb-2">Emoji</label>
-                    <input
-                        type="text"
-                        value={formData.emoji}
-                        onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
-                        placeholder="🎯"
-                        className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
-                        maxLength={2}
-                    />
-                </div>
-
-                {/* Twitter-specific fields */}
-                {formData.category === 'TWITTER' && (
-                    <>
-                        <div>
-                            <label className="block text-sm font-medium mb-2">Tweet URL</label>
-                            <input
-                                type="url"
-                                value={formData.tweetUrl}
-                                onChange={(e) => setFormData({ ...formData, tweetUrl: e.target.value })}
-                                placeholder="https://twitter.com/user/status/123..."
-                                className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
-                                required={formData.category === 'TWITTER'}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-2">Metric Type</label>
-                            <select
-                                value={formData.metricType}
-                                onChange={(e) => setFormData({ ...formData, metricType: e.target.value })}
-                                className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
-                            >
-                                <option value="like">Likes</option>
-                                <option value="retweet">Retweets</option>
-                                <option value="reply">Replies</option>
-                                <option value="view">Views</option>
-                                <option value="quote">Quotes</option>
-                            </select>
-                        </div>
-                    </>
-                )}
-
-                {/* Ink Chain-specific fields */}
-                {formData.category === 'INK CHAIN' && (
-                    <>
-                        <div>
-                            <label className="block text-sm font-medium mb-2">Contract Address (Optional)</label>
-                            <input
-                                type="text"
-                                value={formData.inkContractAddress}
-                                onChange={(e) => setFormData({ ...formData, inkContractAddress: e.target.value })}
-                                placeholder="0x..."
-                                className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-2">Metric Type</label>
-                            <select
-                                value={formData.metricType}
-                                onChange={(e) => setFormData({ ...formData, metricType: e.target.value })}
-                                className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
-                            >
-                                <option value="transactions">Total Transactions</option>
-                                <option value="tvl">TVL (USD)</option>
-                                <option value="gas_price">Gas Price</option>
-                                <option value="block_number">Block Number</option>
-                                <option value="users">Active Users</option>
-                                <option value="active_wallets">Active Wallets</option>
-                                <option value="contracts">Contracts</option>
-                                <option value="deployed_contracts">Deployed Contracts</option>
-                            </select>
-                        </div>
-                    </>
-                )}
-
-                {/* Target Metric */}
-                <div>
-                    <label className="block text-sm font-medium mb-2">Target Value</label>
-                    <input
-                        type="number"
-                        value={formData.targetMetric}
-                        onChange={(e) => setFormData({ ...formData, targetMetric: e.target.value })}
-                        placeholder="10000"
-                        className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
-                        required
-                    />
-                </div>
-
-                {/* Duration */}
-                <div>
-                    <label className="block text-sm font-medium mb-2">Duration (hours)</label>
-                    <input
-                        type="number"
-                        value={formData.durationHours}
-                        onChange={(e) => setFormData({ ...formData, durationHours: e.target.value })}
-                        placeholder="24"
-                        className="w-full input-purple rounded-lg px-3 py-2.5 text-sm sm:text-base"
-                        required
-                    />
-                </div>
-
-                {/* Submit Button */}
-                <button
-                    type="submit"
-                    disabled={creating}
-                    className="w-full btn-primary py-3 sm:py-4 text-base sm:text-lg touch-manipulation"
-                >
-                    {creating ? 'Creating...' : '✨ Create Prediction'}
-                </button>
-            </form>
-        </motion.div>
-    );
-};
-
-
-
-const ManageMarkets = () => {
+    const [isAdmin, setIsAdmin] = useState(false);
     const [markets, setMarkets] = useState([]);
+    const [proposals, setProposals] = useState([]);
+    const [activeTab, setActiveTab] = useState('proposals'); // 'proposals', 'markets', 'create'
+
     const [loading, setLoading] = useState(true);
 
-    const fetchMarkets = async () => {
+    // Create Market Form State
+    const [formData, setFormData] = useState({
+        tweetId: '',
+        targetMetric: '',
+        metricType: 'like',
+        duration: 24,
+        description: ''
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (isConnected && address) {
+            const adminStatus = address.toLowerCase() === ADMIN_WALLET.toLowerCase();
+            setIsAdmin(adminStatus);
+
+            if (adminStatus) {
+                fetchData();
+            }
+        }
+    }, [address, isConnected]);
+
+    const fetchData = async () => {
         try {
+            setLoading(true);
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-            // Use admin endpoint to get all unresolved markets including expired ones
-            const response = await axios.get(`${API_URL}/api/admin/markets`);
-            setMarkets(response.data.markets);
-            setLoading(false);
+
+            // Fetch markets and proposals in parallel
+            const [marketsRes, proposalsRes] = await Promise.all([
+                axios.get(`${API_URL}/api/admin/markets`),
+                axios.get(`${API_URL}/api/admin/proposals`)
+            ]);
+
+            if (marketsRes.data.success) {
+                setMarkets(marketsRes.data.markets);
+            }
+
+            if (proposalsRes.data.success) {
+                setProposals(proposalsRes.data.proposals);
+            }
         } catch (error) {
-            console.error('Error fetching markets:', error);
-            toast.error('Failed to load markets');
+            console.error('Error fetching admin data:', error);
+            toast.error('Failed to load dashboard data');
+        } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchMarkets();
-    }, []);
+    const handleApproveProposal = async (proposalId) => {
+        try {
+            const loadingToast = toast.loading('Approving & Deploying Market...');
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-    if (loading) return <div className="text-center py-8">Loading markets...</div>;
+            const response = await axios.post(`${API_URL}/api/admin/proposals/approve`, {
+                proposalId
+            });
 
-    // Separate markets into active and expired
-    const activeMarkets = markets.filter(m => !m.expired);
-    const expiredMarkets = markets.filter(m => m.expired);
+            if (response.data.success) {
+                toast.success('✅ Market Approved & Deployed!', { id: loadingToast });
+                fetchData(); // Refresh list
+            }
+        } catch (error) {
+            console.error('Error approving proposal:', error);
+            toast.error(error.response?.data?.error || 'Failed to approve proposal');
+        }
+    };
+
+    const handleRejectProposal = async (proposalId) => {
+        if (!window.confirm('Are you sure you want to reject this proposal?')) return;
+
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+            const response = await axios.post(`${API_URL}/api/admin/proposals/reject`, {
+                proposalId
+            });
+
+            if (response.data.success) {
+                toast.success('Proposal Rejected');
+                fetchData(); // Refresh list
+            }
+        } catch (error) {
+            console.error('Error rejecting proposal:', error);
+            toast.error('Failed to reject proposal');
+        }
+    };
+
+    // ... Existing handlers (handleResolve, handleCreateSubmit) ...
+    const handleResolve = async (marketId) => {
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            const response = await axios.post(`${API_URL}/api/admin/resolve-market`, {
+                marketId
+            });
+
+            if (response.data.success) {
+                toast.success(`Market resolved: ${response.data.outcome ? 'YES' : 'NO'}`);
+                fetchData();
+            }
+        } catch (error) {
+            console.error('Error resolving market:', error);
+            toast.error(error.response?.data?.error || 'Failed to resolve market');
+        }
+    };
+
+    const handleCreateSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            if (!formData.tweetId || !formData.targetMetric) {
+                toast.error('Please fill required fields');
+                return;
+            }
+
+            const response = await axios.post(`${API_URL}/api/admin/create-market`, {
+                tweetId: formData.tweetId,
+                targetMetric: parseInt(formData.targetMetric),
+                metricType: formData.metricType,
+                durationHours: parseInt(formData.duration),
+                description: formData.description
+            });
+
+            if (response.data.success) {
+                toast.success('Market Created Successfully!');
+                setFormData({ tweetId: '', targetMetric: '', metricType: 'like', duration: 24, description: '' });
+                fetchData();
+                setActiveTab('markets');
+            }
+        } catch (error) {
+            console.error('Error creating market:', error);
+            toast.error(error.response?.data?.error || 'Failed to create market');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    if (!isConnected || !isAdmin) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-3xl font-bold text-red-500 mb-4">Access Denied</h1>
+                    <p className="text-gray-400">You must be an admin to view this page.</p>
+                    <Link to="/" className="btn-primary mt-6 inline-block">Return Home</Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <motion.div
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            className="card p-4 sm:p-6 lg:p-8 mt-8"
-        >
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold flex items-center space-x-2">
-                    <span>🛠️</span>
-                    <span>Manage Markets</span>
-                </h2>
-                <button onClick={fetchMarkets} className="text-sm text-neon-purple hover:text-white transition-colors">
-                    🔄 Refresh
-                </button>
-            </div>
-
-            {/* Expired Unresolved Markets Section */}
-            {expiredMarkets.length > 0 && (
-                <div className="mb-8">
-                    <div className="flex items-center gap-2 mb-4">
-                        <span className="text-lg font-bold text-red-400">⚠️ Expired & Unresolved</span>
-                        <span className="text-xs bg-red-900/30 text-red-300 px-2 py-1 rounded">
-                            {expiredMarkets.length} need resolution
-                        </span>
-                    </div>
-                    <div className="space-y-4">
-                        {expiredMarkets.map((market) => (
-                            <div key={market.id} className="glass p-4 rounded-lg border-2 border-red-500/50 bg-red-900/10 flex flex-col sm:flex-row justify-between items-center gap-4">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-xs font-mono bg-purple-900/50 px-2 py-0.5 rounded text-purple-200">
-                                            ID: {market.id}
-                                        </span>
-                                        <span className="text-xs font-mono px-2 py-0.5 rounded bg-red-900 text-red-300">
-                                            EXPIRED
-                                        </span>
-                                        {market.category && (
-                                            <span className="text-xs font-mono px-2 py-0.5 rounded bg-purple-900 text-purple-300">
-                                                {market.category}
-                                            </span>
-                                        )}
-                                    </div>
-                                    {market.question && (
-                                        <div className="font-bold text-white mb-1">
-                                            {market.emoji} {market.question}
-                                        </div>
-                                    )}
-                                    <div className="text-sm text-gray-300 mb-1">
-                                        Target: {market.targetMetric} {market.metricType}
-                                        {market.currentMetric !== undefined && (
-                                            <span className="ml-2 text-gray-400">
-                                                (Current: {market.currentMetric})
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="text-xs text-gray-400 truncate max-w-md">
-                                        {market.tweetId && `Tweet ID: ${market.tweetId}`}
-                                        {market.tweetUrl && (
-                                            <a href={market.tweetUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-neon-purple hover:underline">
-                                                View Tweet
-                                            </a>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <ManualResolveButton
-                                    marketId={market.id}
-                                    onResolved={fetchMarkets}
-                                />
-                            </div>
-                        ))}
-                    </div>
+        <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+                <div className="flex items-center justify-between mb-8">
+                    <h1 className="text-3xl font-display font-bold text-gradient-cyber">
+                        Admin Dashboard 🎛️
+                    </h1>
+                    <button onClick={fetchData} className="btn-secondary text-sm">
+                        🔄 Refresh Data
+                    </button>
                 </div>
-            )}
 
-            {/* Active Markets Section */}
-            <div>
-                <div className="flex items-center gap-2 mb-4">
-                    <span className="text-lg font-bold text-gray-300">Active Markets</span>
-                    <span className="text-xs bg-blue-900/30 text-blue-300 px-2 py-1 rounded">
-                        {activeMarkets.length}
-                    </span>
+                {/* Tabs */}
+                <div className="flex space-x-4 mb-8 overflow-x-auto pb-2">
+                    <button
+                        onClick={() => setActiveTab('proposals')}
+                        className={`px-6 py-2 rounded-full font-bold transition-all ${activeTab === 'proposals'
+                                ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-black'
+                                : 'glass text-gray-400 hover:text-white'
+                            }`}
+                    >
+                        📋 Proposals {proposals.length > 0 && <span className="ml-2 bg-black/20 px-2 rounded-full">{proposals.length}</span>}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('markets')}
+                        className={`px-6 py-2 rounded-full font-bold transition-all ${activeTab === 'markets'
+                                ? 'bg-purple-600 text-white'
+                                : 'glass text-gray-400 hover:text-white'
+                            }`}
+                    >
+                        📊 Active Markets
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('create')}
+                        className={`px-6 py-2 rounded-full font-bold transition-all ${activeTab === 'create'
+                                ? 'bg-blue-600 text-white'
+                                : 'glass text-gray-400 hover:text-white'
+                            }`}
+                    >
+                        ➕ Manual Create
+                    </button>
                 </div>
-                <div className="space-y-4">
-                    {activeMarkets.length === 0 ? (
-                        <div className="text-gray-400 text-center py-4">No active markets found</div>
+
+                {/* Content Area */}
+                <AnimatePresence mode="wait">
+                    {loading ? (
+                        <motion.div
+                            key="loading"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex justify-center py-20"
+                        >
+                            <div className="spinner w-12 h-12"></div>
+                        </motion.div>
                     ) : (
-                        activeMarkets.map((market) => (
-                            <div key={market.id} className="glass p-4 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-xs font-mono bg-purple-900/50 px-2 py-0.5 rounded text-purple-200">
-                                            ID: {market.id}
-                                        </span>
-                                        <span className="text-xs font-mono px-2 py-0.5 rounded bg-blue-900 text-blue-300">
-                                            ACTIVE
-                                        </span>
-                                        {market.category && (
-                                            <span className="text-xs font-mono px-2 py-0.5 rounded bg-purple-900 text-purple-300">
-                                                {market.category}
-                                            </span>
-                                        )}
-                                    </div>
-                                    {market.question && (
-                                        <div className="font-bold text-white mb-1">
-                                            {market.emoji} {market.question}
+                        <>
+                            {/* Proposals Tab */}
+                            {activeTab === 'proposals' && (
+                                <motion.div
+                                    key="proposals"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                >
+                                    {proposals.length === 0 ? (
+                                        <div className="text-center py-20 glass rounded-2xl">
+                                            <div className="text-6xl mb-4">😴</div>
+                                            <h3 className="text-xl font-bold text-gray-300">No Pending Proposals</h3>
+                                            <p className="text-gray-500">All caught up! Check back later.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                            {proposals.map((proposal) => (
+                                                <div key={proposal.id} className="glass-strong p-6 rounded-2xl border border-yellow-500/20 hover:border-yellow-500/50 transition-all">
+                                                    <div className="flex justify-between items-start mb-4">
+                                                        <span className="text-4xl">{proposal.emoji}</span>
+                                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                                                            PENDING
+                                                        </span>
+                                                    </div>
+
+                                                    <h3 className="text-lg font-bold mb-3 line-clamp-2">{proposal.question}</h3>
+
+                                                    <div className="space-y-2 mb-6 text-sm text-gray-400">
+                                                        <div className="flex justify-between">
+                                                            <span>Target:</span>
+                                                            <span className="text-white font-mono">
+                                                                {proposal.target_metric.toLocaleString()} {proposal.metric_type}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span>Duration:</span>
+                                                            <span className="text-white">{proposal.duration_hours} Hours</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span>Proposer:</span>
+                                                            <span className="text-white font-mono" title={proposal.created_by}>
+                                                                {proposal.created_by.slice(0, 6)}...{proposal.created_by.slice(-4)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="grid grid-cols-2 gap-3">
+                                                        <button
+                                                            onClick={() => handleRejectProposal(proposal.id)}
+                                                            className="px-4 py-2 rounded-xl border border-red-500/30 text-red-500 hover:bg-red-500/10 transition-colors text-sm font-bold"
+                                                        >
+                                                            Reject
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleApproveProposal(proposal.id)}
+                                                            className="px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-500 transition-colors text-sm font-bold shadow-lg shadow-green-900/20"
+                                                        >
+                                                            Approve
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     )}
-                                    <div className="text-sm text-gray-300 mb-1">
-                                        Target: {market.targetMetric} {market.metricType}
-                                        {market.currentMetric !== undefined && (
-                                            <span className="ml-2 text-gray-400">
-                                                (Current: {market.currentMetric})
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="text-xs text-gray-400 truncate max-w-md">
-                                        {market.tweetId && `Tweet ID: ${market.tweetId}`}
-                                        {market.tweetUrl && (
-                                            <a href={market.tweetUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-neon-purple hover:underline">
-                                                View Tweet
-                                            </a>
-                                        )}
-                                    </div>
-                                </div>
+                                </motion.div>
+                            )}
 
-                                <ManualResolveButton
-                                    marketId={market.id}
-                                    onResolved={fetchMarkets}
-                                />
-                            </div>
-                        ))
+                            {/* Active Markets Tab */}
+                            {activeTab === 'markets' && (
+                                <motion.div
+                                    key="markets"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="space-y-6"
+                                >
+                                    {markets.map((market) => (
+                                        <div key={market.id} className="glass p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <span className="text-3xl">{market.emoji}</span>
+                                                    <h3 className="font-bold text-lg">{market.question}</h3>
+                                                </div>
+                                                <div className="flex gap-4 text-sm text-gray-400">
+                                                    <span>ID: #{market.id}</span>
+                                                    <span>Target: {market.targetMetric}</span>
+                                                    <span className={market.expired ? "text-red-400" : "text-green-400"}>
+                                                        {market.expired ? "Expired" : "Active"}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-4">
+                                                {!market.resolved && (
+                                                    <button
+                                                        onClick={() => handleResolve(market.id)}
+                                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-white font-bold transition-all"
+                                                    >
+                                                        Force Resolve
+                                                    </button>
+                                                )}
+                                                {market.resolved && (
+                                                    <span className="px-4 py-2 bg-gray-700 rounded-lg text-gray-400 font-bold">
+                                                        Resolved
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </motion.div>
+                            )}
+
+                            {/* Manual Create Tab */}
+                            {activeTab === 'create' && (
+                                <motion.div
+                                    key="create"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="max-w-2xl mx-auto glass p-8 rounded-3xl"
+                                >
+                                    <h2 className="text-2xl font-bold mb-6">Create Custom Market</h2>
+                                    <form onSubmit={handleCreateSubmit} className="space-y-6">
+                                        <div>
+                                            <label className="block text-gray-400 mb-2">Tweet ID</label>
+                                            <input
+                                                type="text"
+                                                className="w-full input-purple p-3 rounded-xl"
+                                                value={formData.tweetId}
+                                                onChange={(e) => setFormData({ ...formData, tweetId: e.target.value })}
+                                                placeholder="1234567890"
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-gray-400 mb-2">Target Metric</label>
+                                                <input
+                                                    type="number"
+                                                    className="w-full input-purple p-3 rounded-xl"
+                                                    value={formData.targetMetric}
+                                                    onChange={(e) => setFormData({ ...formData, targetMetric: e.target.value })}
+                                                    placeholder="1000"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-gray-400 mb-2">Metric Type</label>
+                                                <select
+                                                    className="w-full input-purple p-3 rounded-xl"
+                                                    value={formData.metricType}
+                                                    onChange={(e) => setFormData({ ...formData, metricType: e.target.value })}
+                                                >
+                                                    <option value="like">Likes</option>
+                                                    <option value="retweet">Retweets</option>
+                                                    <option value="view">Views</option>
+                                                    <option value="reply">Replies</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-gray-400 mb-2">Duration (Hours)</label>
+                                            <input
+                                                type="number"
+                                                className="w-full input-purple p-3 rounded-xl"
+                                                value={formData.duration}
+                                                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-gray-400 mb-2">Custom Description (Optional)</label>
+                                            <input
+                                                type="text"
+                                                className="w-full input-purple p-3 rounded-xl"
+                                                value={formData.description}
+                                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                                placeholder="Will this tweet reach..."
+                                            />
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            disabled={isSubmitting}
+                                            className="w-full btn-primary py-3 font-bold"
+                                        >
+                                            {isSubmitting ? 'Creating...' : 'Create Market'}
+                                        </button>
+                                    </form>
+                                </motion.div>
+                            )}
+                        </>
                     )}
-                </div>
+                </AnimatePresence>
             </div>
-        </motion.div>
+        </div>
     );
 };
-
-const ConnectWalletPrompt = () => (
-    <div className="min-h-screen flex items-center justify-center px-4">
-        <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center"
-        >
-            <div className="text-6xl sm:text-8xl mb-4">👛</div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gradient-cyber mb-4">
-                Connect Your Wallet
-            </h2>
-            <p className="text-gray-400 text-base sm:text-lg">
-                Connect your wallet to access the admin dashboard
-            </p>
-        </motion.div>
-    </div>
-);
-
-const UnauthorizedAccess = () => (
-    <div className="min-h-screen flex items-center justify-center px-4">
-        <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center"
-        >
-            <div className="text-6xl sm:text-8xl mb-4">🚫</div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-red-500 mb-4">
-                Access Denied
-            </h2>
-            <p className="text-gray-400 text-base sm:text-lg mb-8">
-                Only admin wallet can access this page
-            </p>
-            <Link to="/">
-                <button className="btn-primary px-6 py-3">
-                    Back to Home
-                </button>
-            </Link>
-        </motion.div>
-    </div>
-);
 
 export default Admin;

@@ -268,11 +268,10 @@ const MarketDetail = () => {
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
                     <span className="text-5xl">{marketInfo.emoji}</span>
-                    <span className={`px-4 py-2 rounded-full font-mono text-sm ${
-                      marketInfo.category === 'INK CHAIN'
+                    <span className={`px-4 py-2 rounded-full font-mono text-sm ${marketInfo.category === 'INK CHAIN'
                         ? 'bg-purple-900/50 text-purple-300 border border-purple-500/30'
                         : 'bg-blue-900/50 text-blue-300 border border-blue-500/30'
-                    }`}>
+                      }`}>
                       {marketInfo.category}
                     </span>
                   </div>
@@ -287,7 +286,7 @@ const MarketDetail = () => {
                   )}
                 </div>
 
-                <h1 className="text-3xl md:text-4xl font-arcade text-shadow-neon text-white mb-8 leading-relaxed">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-arcade text-shadow-neon text-white mb-6 leading-tight">
                   {marketInfo.question}
                 </h1>
 
@@ -313,22 +312,22 @@ const MarketDetail = () => {
                 </div>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="purple-box p-4 rounded-xl text-center">
-                    <div className="text-gray-400 text-xs mb-1">YES POOL</div>
-                    <div className="text-xl font-bold text-green-400">{market.yesPool} USDC</div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                  <div className="purple-box p-3 sm:p-4 rounded-xl text-center">
+                    <div className="text-gray-400 text-[10px] sm:text-xs mb-1">YES POOL</div>
+                    <div className="text-base sm:text-xl font-bold text-green-400">{market.yesPool} USDC</div>
                   </div>
-                  <div className="purple-box p-4 rounded-xl text-center">
-                    <div className="text-gray-400 text-xs mb-1">NO POOL</div>
-                    <div className="text-xl font-bold text-red-400">{market.noPool} USDC</div>
+                  <div className="purple-box p-3 sm:p-4 rounded-xl text-center">
+                    <div className="text-gray-400 text-[10px] sm:text-xs mb-1">NO POOL</div>
+                    <div className="text-base sm:text-xl font-bold text-red-400">{market.noPool} USDC</div>
                   </div>
-                  <div className="purple-box p-4 rounded-xl text-center">
-                    <div className="text-gray-400 text-xs mb-1">TOTAL VOLUME</div>
-                    <div className="text-xl font-bold text-gradient-gold">{totalPool.toFixed(2)} USDC</div>
+                  <div className="purple-box p-3 sm:p-4 rounded-xl text-center">
+                    <div className="text-gray-400 text-[10px] sm:text-xs mb-1">VOLUME</div>
+                    <div className="text-base sm:text-xl font-bold text-gradient-gold">{totalPool.toFixed(1)} USDC</div>
                   </div>
-                  <div className="purple-box p-4 rounded-xl text-center">
-                    <div className="text-gray-400 text-xs mb-1">TIME LEFT</div>
-                    <div className={`text-xl font-bold ${isExpired ? 'text-red-400' : 'text-gradient-purple'}`}>
+                  <div className="purple-box p-3 sm:p-4 rounded-xl text-center">
+                    <div className="text-gray-400 text-[10px] sm:text-xs mb-1">TIME</div>
+                    <div className={`text-base sm:text-xl font-bold ${isExpired ? 'text-red-400' : 'text-gradient-purple'}`}>
                       {timeLeft}
                     </div>
                   </div>
@@ -448,11 +447,11 @@ const MarketDetail = () => {
                     onClick={() => handleAction(true)}
                     disabled={isBetting || isApproving}
                     className={`rounded-2xl border-b-8 active:border-b-0 active:translate-y-2 transition-all p-4 flex flex-col items-center justify-center gap-2
-                      ${needsApproval ? 'bg-yellow-500 border-yellow-700' : 'bg-green-500 border-green-700'}
+                      ${needsApproval ? 'bg-amber-500 border-amber-700' : 'bg-green-500 border-green-700'}
                       hover:brightness-110 shadow-lg disabled:opacity-50
                     `}
                   >
-                    <div className="text-3xl">🚀</div>
+                    <div className="text-3xl">{needsApproval ? '🔓' : '🚀'}</div>
                     <span className="font-arcade text-white text-sm">
                       {needsApproval ? 'APPROVE' : 'BET YES'}
                     </span>
@@ -462,11 +461,11 @@ const MarketDetail = () => {
                     onClick={() => handleAction(false)}
                     disabled={isBetting || isApproving}
                     className={`rounded-2xl border-b-8 active:border-b-0 active:translate-y-2 transition-all p-4 flex flex-col items-center justify-center gap-2
-                      ${needsApproval ? 'bg-yellow-500 border-yellow-700' : 'bg-red-500 border-red-700'}
+                      ${needsApproval ? 'bg-amber-500 border-amber-700' : 'bg-red-500 border-red-700'}
                       hover:brightness-110 shadow-lg disabled:opacity-50
                     `}
                   >
-                    <div className="text-3xl">📉</div>
+                    <div className="text-3xl">{needsApproval ? '🔓' : '📉'}</div>
                     <span className="font-arcade text-white text-sm">
                       {needsApproval ? 'APPROVE' : 'BET NO'}
                     </span>

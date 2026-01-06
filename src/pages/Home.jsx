@@ -17,7 +17,7 @@ const Home = () => {
   const [markets, setMarkets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('ink');
   const [sortBy, setSortBy] = useState('newest');
   const [userStats, setUserStats] = useState(null);
   const [platformStats, setPlatformStats] = useState({
@@ -85,15 +85,15 @@ const Home = () => {
     // Time filter
     if (filter === 'ending-soon') {
       const timeLeft = market.deadline * 1000 - Date.now();
-      return timeLeft < 6 * 60 * 60 * 1000 && timeLeft > 0;
+      return timeLeft < 24 * 60 * 60 * 1000 && timeLeft > 0;
     }
     if (filter === 'popular') {
       const totalPool = parseFloat(market.yesPool) + parseFloat(market.noPool);
-      return totalPool > 10;
+      return totalPool > 0;
     }
     if (filter === 'new') {
       const createdAt = market.createdAt * 1000;
-      return Date.now() - createdAt < 24 * 60 * 60 * 1000;
+      return Date.now() - createdAt < 7 * 24 * 60 * 60 * 1000; // 7 days
     }
 
     return true;
@@ -231,11 +231,14 @@ const Home = () => {
           className="mb-8"
         >
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            {/* Category Filter */}
-            <CategoryFilter
+            {/* Category Filter - Commented out to show only Ink Chain */}
+            {/* <CategoryFilter
               selected={categoryFilter}
               onChange={setCategoryFilter}
-            />
+            /> */}
+            <div className="text-xl font-bold text-gradient-cyber px-4">
+              Ink Chain Markets ⛓️
+            </div>
 
             {/* Time Filter & Sort */}
             <div className="flex flex-wrap items-center gap-3">
@@ -382,7 +385,7 @@ const MarketCard = ({ market, index }) => {
               <span className={`text-xs font-mono px-2 py-1 rounded ${category === 'INK CHAIN'
                 ? 'bg-purple-900/50 text-purple-300'
                 : 'bg-blue-900/50 text-blue-300'
-              }`}>
+                }`}>
                 {category}
               </span>
             </div>
@@ -535,7 +538,7 @@ const EmptyState = ({ categoryFilter }) => (
       No {categoryFilter !== 'all' ? categoryFilter.toUpperCase() + ' ' : ''}markets yet
     </h2>
     <p className="text-gray-400 text-lg mb-6">
-      {categoryFilter !== 'all' 
+      {categoryFilter !== 'all'
         ? `Try a different category or check back soon!`
         : `Check back soon for trending predictions!`
       }

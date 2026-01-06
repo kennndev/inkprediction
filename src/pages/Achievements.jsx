@@ -94,13 +94,13 @@ const Achievements = () => {
     a => selectedCategory === 'all' || a.category === selectedCategory
   );
 
-  const unlockedCount = ACHIEVEMENTS.filter(a => 
+  const unlockedCount = ACHIEVEMENTS.filter(a =>
     userAchievements.includes(a.id)
   ).length;
 
-  const totalXP = ACHIEVEMENTS
-    .filter(a => userAchievements.includes(a.id))
-    .reduce((sum, a) => sum + a.xp, 0);
+  // Use actual XP from user stats (includes daily rewards, achievements, etc.)
+  // API returns {success: true, stats: {...}}, so we need stats.xp
+  const totalXP = userStats?.stats?.xp || 0;
 
   if (!isConnected) {
     return (
@@ -162,12 +162,12 @@ const Achievements = () => {
           </div>
           <div className="card text-center">
             <div className="text-4xl mb-2">🔥</div>
-            <div className="text-3xl font-bold text-gradient-fire">{userStats?.streak || 0}</div>
+            <div className="text-3xl font-bold text-gradient-fire">{userStats?.stats?.current_streak || 0}</div>
             <div className="text-gray-400">Current Streak</div>
           </div>
           <div className="card text-center">
             <div className="text-4xl mb-2">📊</div>
-            <div className="text-3xl font-bold text-green-400">{userStats?.winRate || 0}%</div>
+            <div className="text-3xl font-bold text-green-400">{userStats?.stats?.win_rate || 0}%</div>
             <div className="text-gray-400">Win Rate</div>
           </div>
         </motion.div>
@@ -271,14 +271,14 @@ const Achievements = () => {
                           className="progress-fill"
                           style={{
                             width: `${Math.min(
-                              (userStats.totalBets / parseInt(achievement.id.split('_')[1])) * 100,
+                              (userStats.stats.total_bets / parseInt(achievement.id.split('_')[1])) * 100,
                               100
                             )}%`
                           }}
                         />
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
-                        {userStats.totalBets} / {achievement.id.split('_')[1]} bets
+                        {userStats.stats.total_bets} / {achievement.id.split('_')[1]} bets
                       </div>
                     </div>
                   )}

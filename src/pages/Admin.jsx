@@ -182,8 +182,8 @@ const Admin = () => {
                     <button
                         onClick={() => setActiveTab('proposals')}
                         className={`px-6 py-2 rounded-full font-bold transition-all ${activeTab === 'proposals'
-                                ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-black'
-                                : 'glass text-gray-400 hover:text-white'
+                            ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-black'
+                            : 'glass text-gray-400 hover:text-white'
                             }`}
                     >
                         📋 Proposals {proposals.length > 0 && <span className="ml-2 bg-black/20 px-2 rounded-full">{proposals.length}</span>}
@@ -191,8 +191,8 @@ const Admin = () => {
                     <button
                         onClick={() => setActiveTab('markets')}
                         className={`px-6 py-2 rounded-full font-bold transition-all ${activeTab === 'markets'
-                                ? 'bg-purple-600 text-white'
-                                : 'glass text-gray-400 hover:text-white'
+                            ? 'bg-purple-600 text-white'
+                            : 'glass text-gray-400 hover:text-white'
                             }`}
                     >
                         📊 Active Markets
@@ -200,8 +200,8 @@ const Admin = () => {
                     <button
                         onClick={() => setActiveTab('create')}
                         className={`px-6 py-2 rounded-full font-bold transition-all ${activeTab === 'create'
-                                ? 'bg-blue-600 text-white'
-                                : 'glass text-gray-400 hover:text-white'
+                            ? 'bg-blue-600 text-white'
+                            : 'glass text-gray-400 hover:text-white'
                             }`}
                     >
                         ➕ Manual Create
@@ -297,39 +297,52 @@ const Admin = () => {
                                     exit={{ opacity: 0, y: -10 }}
                                     className="space-y-6"
                                 >
-                                    {markets.map((market) => (
-                                        <div key={market.id} className="glass p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <span className="text-3xl">{market.emoji}</span>
-                                                    <h3 className="font-bold text-lg">{market.question}</h3>
-                                                </div>
-                                                <div className="flex gap-4 text-sm text-gray-400">
-                                                    <span>ID: #{market.id}</span>
-                                                    <span>Target: {market.targetMetric}</span>
-                                                    <span className={market.expired ? "text-red-400" : "text-green-400"}>
-                                                        {market.expired ? "Expired" : "Active"}
-                                                    </span>
-                                                </div>
-                                            </div>
+                                    {markets.map((market) => {
+                                        const totalPool = parseFloat(market.yesPool || 0) + parseFloat(market.noPool || 0);
+                                        const hasBets = totalPool > 0;
 
-                                            <div className="flex items-center gap-4">
-                                                {!market.resolved && (
-                                                    <button
-                                                        onClick={() => handleResolve(market.id)}
-                                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-white font-bold transition-all"
-                                                    >
-                                                        Force Resolve
-                                                    </button>
-                                                )}
-                                                {market.resolved && (
-                                                    <span className="px-4 py-2 bg-gray-700 rounded-lg text-gray-400 font-bold">
-                                                        Resolved
-                                                    </span>
-                                                )}
+                                        return (
+                                            <div key={market.id} className="glass p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        <span className="text-3xl">{market.emoji}</span>
+                                                        <h3 className="font-bold text-lg">{market.question}</h3>
+                                                    </div>
+                                                    <div className="flex gap-4 text-sm text-gray-400">
+                                                        <span>ID: #{market.id}</span>
+                                                        <span>Target: {market.targetMetric}</span>
+                                                        <span className={market.expired ? "text-red-400" : "text-green-400"}>
+                                                            {market.expired ? "Expired" : "Active"}
+                                                        </span>
+                                                        <span className={hasBets ? "text-blue-400" : "text-yellow-400"}>
+                                                            Pool: ${totalPool.toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center gap-4">
+                                                    {!market.resolved && (
+                                                        <button
+                                                            onClick={() => handleResolve(market.id)}
+                                                            disabled={!hasBets}
+                                                            className={`px-4 py-2 rounded-lg font-bold transition-all ${hasBets
+                                                                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                                                                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                                                                }`}
+                                                            title={!hasBets ? "Cannot resolve market with no bets" : "Resolve this market"}
+                                                        >
+                                                            {hasBets ? 'Force Resolve' : 'No Bets Yet'}
+                                                        </button>
+                                                    )}
+                                                    {market.resolved && (
+                                                        <span className="px-4 py-2 bg-gray-700 rounded-lg text-gray-400 font-bold">
+                                                            Resolved
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    })}}
                                 </motion.div>
                             )}
 

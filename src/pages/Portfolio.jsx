@@ -239,7 +239,21 @@ const ResolvedBetCard = ({ bet, index, onClaimSuccess }) => {
 
   const { isLoading: isClaimingTx } = useWaitForTransaction({
     hash: claimData?.hash,
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      // Record claim in database
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        await axios.post(`${API_URL}/api/user/claim`, {
+          userAddress: bet.user_address || bet.userAddress,
+          marketId: bet.marketId || bet.market_id,
+          transactionHash: data.transactionHash
+        });
+        console.log('✅ Claim recorded in database');
+      } catch (error) {
+        console.error('❌ Failed to record claim in database:', error);
+        // Don't show error to user - claim is already on blockchain
+      }
+
       setIsClaiming(false);
       toast.success('🎉 Winnings claimed successfully!');
 

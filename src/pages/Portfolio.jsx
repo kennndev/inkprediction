@@ -218,7 +218,7 @@ const BetCard = ({ bet, index }) => (
 
       <div className="space-y-2 text-sm text-gray-400">
         <div>Market ID: #{bet.marketId}</div>
-        <div>Tweet: {bet.tweetId.slice(0, 15)}...</div>
+        {bet.tweetId && <div>Tweet: {bet.tweetId.slice(0, 15)}...</div>}
       </div>
 
       <div className="mt-4 text-center">
